@@ -1,0 +1,1119 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JPTRIPGRAM | 전체 발표 슬라이드</title>
+  <style>
+    :root{
+      --bg:#0b1220; --text:#e9eefc; --muted:#a9b4d0;
+      --accent:#7aa2ff; --line:rgba(255,255,255,.12);
+      --card:rgba(255,255,255,.04);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%; margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;}
+    body{
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(122,162,255,.25), transparent 55%),
+        radial-gradient(900px 600px at 85% 70%, rgba(139,92,246,.18), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      overflow:hidden;
+    }
+    .deck{height:100%; width:100%; position:relative;}
+    .slide{
+      position:absolute; inset:0;
+      padding:54px 70px;
+      display:flex; flex-direction:column;
+      opacity:0; transform:translateY(8px) scale(.995);
+      transition:opacity .25s ease, transform .25s ease;
+      pointer-events:none;
+    }
+    .slide.active{opacity:1; transform:translateY(0) scale(1); pointer-events:auto;}
+
+    /* Header */
+    .top{display:flex; align-items:flex-start; justify-content:space-between; gap:24px;}
+    .badge{display:inline-flex; gap:10px; align-items:center; padding:10px 14px; border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.04); color:var(--muted); font-size:14px;}
+    .dot{width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 18px rgba(122,162,255,.9);}
+
+    /* Typography */
+    h1{font-size:56px; letter-spacing:-.5px; margin:10px 0 6px;}
+    h2{font-size:44px; letter-spacing:-.4px; margin:6px 0 12px;}
+    h3{font-size:24px; margin:0 0 10px;}
+    p{margin:0; color:var(--muted); font-size:20px; line-height:1.5;}
+    ul{margin:10px 0 0; padding-left:20px;}
+    li{color:var(--text); font-size:21px; line-height:1.55; margin:8px 0;}
+    li span{color:var(--muted); font-size:17px;}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;}
+
+	.techItem.wide{
+  grid-column: span 2;        /* 🔥 가로 2칸 차지 */
+}
+
+.techItem.wide span{
+  font-size:17px;             /* 살짝 키워도 안정 */
+  white-space:nowrap;         /* 줄바꿈 방지 */
+}
+    /* Cards & Layout */
+    .card{
+      border:1px solid var(--line);
+      background:var(--card);
+      border-radius:18px;
+      padding:20px 20px;
+      box-shadow:0 12px 40px rgba(0,0,0,.25);
+      min-height:0;
+    }
+    .grid{
+      margin-top:22px;
+      display:grid;
+      gap:18px;
+      grid-template-columns: 1.05fr .95fr;
+      flex:1;
+      min-height:0;
+    }
+    .shotLayout{margin-top:18px; display:grid; grid-template-columns: 1.15fr .85fr; gap:18px; flex:1; min-height:0;}
+    .twoCol{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px; flex:1; min-height:0;}
+    .spacer{height:14px}
+
+    /* Media */
+    .mediaFrame{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 12px 40px rgba(0,0,0,.25);
+      position:relative;
+      min-height:320px;
+      min-height:0;
+    }
+    .mediaFrame.tall{min-height:430px;}  /* 너무 크게 잡으면 슬라이드가 넘쳐서 잘릴 수 있음 */
+    .mediaFrame.small{min-height:240px;}
+
+    /* ✅ 이미지: 안 잘리게(특히 MVC, ERD 같은 세로형) */
+    .mediaFrame img{
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:contain;
+      object-position:center;
+      background:#fff;
+    }
+
+	.urlGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap:18px;
+  flex:1;
+  min-height:0;
+}
+.urlCard{ padding:18px; }
+.urlList{
+  margin:10px 0 0;
+  padding-left:0;
+  list-style:none;
+}
+.urlList li{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  padding:8px 0;
+  border-bottom:1px dashed rgba(255,255,255,.10);
+  font-size:16px;            /* 기존 li(21px)보다 줄여서 fit */
+  margin:0;
+}
+.urlList li:last-child{ border-bottom:none; }
+
+.urlList .mono{
+  font-size:15px;
+  color:#e9eefc;
+  white-space:nowrap;
+}
+.urlList .lbl{
+  color:rgba(233,238,252,.72);
+  font-size:15px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.urlList .sep{ color:rgba(233,238,252,.35); }
+
+.urlList .tag{
+  margin-left:auto;
+  font-size:12px;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.06);
+  color:rgba(233,238,252,.8);
+}
+
+.urlNote{
+  margin-top:12px;
+  color:rgba(233,238,252,.65);
+  font-size:14px;
+}
+@media (max-width: 980px){
+  .urlGrid{ grid-template-columns:1fr; }
+  .urlList li{ font-size:15px; }
+}
+	
+	
+    /* ✅ 비디오: 기존대로 꽉 차게 */
+    .mediaFrame video{
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:cover;
+    }
+
+    .caption{
+      position:absolute; left:0; right:0; bottom:0;
+      padding:12px 14px;
+      background:linear-gradient(to top, rgba(0,0,0,.65), rgba(0,0,0,0));
+      color:#eaf0ff;
+      font-size:14px;
+    }
+    .placeholder{
+      height:100%;
+      display:flex; align-items:center; justify-content:center;
+      color:rgba(233,238,252,.55);
+      font-size:16px;
+      border:2px dashed rgba(255,255,255,.18);
+      border-radius:18px;
+      margin:14px;
+      text-align:center;
+      padding:16px;
+      background:rgba(255,255,255,.02);
+    }
+    .hint{font-size:14px; color:rgba(233,238,252,.7); margin-top:10px;}
+
+    /* Tech Icons */
+    .techGrid{margin-top:18px; display:grid; grid-template-columns:1fr 1fr; gap:18px; flex:1; min-height:0;}
+    .techCard{
+      border:1px solid var(--line);
+      background:var(--card);
+      border-radius:18px;
+      padding:20px;
+      box-shadow:0 12px 40px rgba(0,0,0,.25);
+      min-height:0;
+    }
+    .iconRow{
+	  display:grid;
+	  grid-template-columns:repeat(4, minmax(0,1fr));
+	  gap:16px;
+	  margin-top:16px;
+	}
+    
+    .techItem{
+	  display:flex;
+	  align-items:center;
+	  gap:14px;
+	  padding:18px 16px;          /* ⬅️ 높이 확보 */
+	  border:1px solid var(--line);
+	  border-radius:16px;
+	  background:rgba(255,255,255,.04);
+	}
+    .techItem img{
+	  width:38px;                 /* ⬅️ 28 → 38 */
+	  height:38px;
+	  object-fit:contain;
+	  filter:drop-shadow(0 8px 18px rgba(0,0,0,.25));
+	}
+
+	.techItem span{
+	  font-size:17px;             /* ⬅️ 16 → 17 */
+	  font-weight:500;
+	  color:var(--text);
+	}
+
+	.techText{
+  display:flex;
+  flex-direction:column;
+  line-height:1.1;
+}
+
+/* 메인 이름 */
+.techText .name{
+  font-size:16px;
+  color:var(--text);
+}
+
+/* 버전 (작게, 은은하게) */
+.techText .version{
+  font-size:12px;
+  color:var(--muted);
+  opacity:.85;
+}
+	
+    .techNote{margin-top:14px; color:var(--muted); font-size:16px; line-height:1.5;}
+
+    /* Footer */
+    .footer{
+      position:absolute; left:0; right:0; bottom:0;
+      padding:16px 26px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-top:1px solid var(--line);
+      background:linear-gradient(to top, rgba(11,18,32,.88), rgba(11,18,32,0));
+      font-size:14px; color:var(--muted);
+    }
+    .controls{display:flex; gap:10px; align-items:center;}
+    button{
+      border:1px solid var(--line); background:rgba(255,255,255,.06);
+      color:var(--text); border-radius:12px; padding:10px 12px;
+      cursor:pointer; font-size:14px;
+    }
+    button:hover{background:rgba(255,255,255,.10)}
+    .progress{height:8px; width:220px; border-radius:999px; border:1px solid var(--line); overflow:hidden; background:rgba(255,255,255,.04)}
+    .bar{height:100%; width:0%; background:var(--accent)}
+    .kbd{border:1px solid var(--line); padding:2px 8px; border-radius:8px; background:rgba(255,255,255,.04); color:var(--text); font-size:12px;}
+
+    @media (max-width: 980px){
+      .slide{padding:26px 20px;}
+      .grid,.shotLayout,.twoCol,.techGrid{grid-template-columns:1fr;}
+      .iconRow{grid-template-columns:repeat(2, minmax(0,1fr));}
+      h1{font-size:42px;}
+      h2{font-size:34px;}
+      li{font-size:19px;}
+      p{font-size:18px;}
+      .progress{display:none;}
+      .mediaFrame{min-height:220px;}
+      .mediaFrame.tall{min-height:260px;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="deck" id="deck">
+
+    <!-- ✅ 1. 프로젝트 개요 -->
+    <section class="slide active">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 1. プロジェクト概要</div>
+    <div class="badge mono">2026.01.07 ~ 2026.01.14 · 個人開発（ユ・インジェ）</div>
+  </div>
+  <h1>JPTRIPGRAM</h1>
+  <p>
+    日本旅行の体験を記録・共有する旅行ブログサービス<br/>
+    記事／コメント／いいね／タグなど
+    <b>SNS型ブログの主要機能</b>を実装 +
+    <b>地図API連携による拡張</b>
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>プロジェクトの目的</h3>
+      <ul>
+        <li>
+          日本旅行の体験を単なる記録にとどめず
+          <br>
+          <span>– ユーザー間で共有可能な「コンテンツ」として管理するWebサービスを実装</span>
+        </li>
+        <li>
+          MVC構造に基づくWebアプリケーションの設計・実装
+          <br>
+          <span>– Controller / Service / DAO / View の役割分離を理解し、実装に適用</span>
+        </li>
+        <li>
+          実サービスレベルのDB設計経験
+          <br>
+          <span>– 整合性の問題（コメント・いいね等）の発生と解決を経験</span>
+        </li>
+        <li>
+          位置情報（LAT / LNG）を活用した機能拡張
+          <br>
+          <span>– 地図API連携による旅行情報の可視化</span>
+        </li>
+        <li>
+          機能実装にとどまらない設計中心の開発を体得
+          <br>
+          <span>– プロジェクト全体の流れと構造を自ら設計する経験</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="mediaFrame tall">
+      <img src="slides/assets/images/cover.png" alt="代表画像（メイン画面キャプチャ）"
+           onerror="this.remove(); this.parentElement.querySelector('.placeholder').style.display='flex';" />
+      <div class="placeholder" style="display:none;">
+        assets/cover.png<br/>メイン画面キャプチャ（代表画像）を入れてください
+      </div>
+      <div class="caption">代表画像（メイン画面キャプチャ）</div>
+    </div>
+  </div>
+</section>
+
+
+    <!-- ✅ 1-1. (데모) 메인화면 동영상 -->
+    <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> デモ動画</div>
+  </div>
+  <h2>メイン画面デモ</h2>
+  <p>サービスの流れ（一覧 → 詳細 → インタラクション）を短くデモします。</p>
+
+  <div class="mediaFrame tall" style="flex:1; margin-top:18px;">
+    <iframe
+	  width="100%"
+	  height="100%"
+	  src="https://www.youtube.com/embed/fZ2vJ2tIFTM"
+	  title="YouTube video player"
+	  frameborder="0"
+	  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+	  allowfullscreen>
+	</iframe>
+    <div class="placeholder" style="display:none;">
+      assets/main.mp4<br/>メイン画面の動画を入れてください
+    </div>
+    <div class="caption">メイン画面動画</div>
+  </div>
+  <div class="hint">
+    キー：<span class="kbd">F</span> 全画面 /
+    <span class="kbd">→</span> 次のスライド
+  </div>
+</section>
+
+
+    <!-- ✅ 2. 개발 환경 및 사용 기술 (아이콘) -->
+    <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 2. 開発環境・使用技術</div>
+  </div>
+  <h2>開発環境・使用技術</h2>
+
+  <div class="techGrid">
+    <div class="techCard">
+      <h3>開発環境</h3>
+      <div class="iconRow">
+        <div class="techItem">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg" alt="macOS">
+          <span>macOS</span>
+        </div>
+        <div class="techItem">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/eclipse/eclipse-original.svg" alt="Eclipse">
+          <span>Eclipse 24-09</span>
+        </div>
+        <div class="techItem">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tomcat/tomcat-original.svg" alt="Tomcat">
+          <span>Tomcat 9</span>
+        </div>
+        <div class="techItem">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg" alt="Oracle">
+          <span>Oracle DB</span>
+        </div>
+        <div class="techItem wide">
+          <img src="slides/assets/icons/sql.png" alt="Oracle SQL Developer">
+          <div class="techText">
+            <span class="name">SQL Developer</span>
+            <span class="version">v24.3.1.347</span>
+          </div>
+        </div>
+      </div>
+      <div class="techNote">OS / IDE / WAS / DB を中心に整理しました。</div>
+    </div>
+
+    <div class="techCard">
+      <h3>使用技術</h3>
+      <div class="iconRow">
+        <div class="techItem">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5">
+          <span>HTML5</span>
+        </div>
+        <div class="techItem">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3">
+          <span>CSS3</span>
+        </div>
+        <div class="techItem">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript">
+          <span>Java<br>Script</span>
+        </div>
+        <div class="techItem">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="JSP">
+          <span>JSP / JSTL</span>
+        </div>
+        <div class="techItem">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java">
+          <span>Java17/<br>Servlet/<br>JDBC</span>
+        </div>
+        <div class="techItem">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg" alt="Oracle SQL">
+          <span>Oracle SQL</span>
+        </div>
+        <div class="techItem">
+          <img src="https://simpleicons.org/icons/leaflet.svg" alt="Leaflet">
+          <span>Leaflet Open<br>Street<br>Map</span>
+        </div>
+        <div class="techItem">
+          <img src="https://unpkg.com/@lobehub/icons-static-png@latest/light/openai.png" alt="ChatGPT">
+          <span>Chat<br>GPT</span>
+        </div>
+      </div>
+
+      <div class="techNote">
+        <b>フレームワークを使わず、純粋なMVC構造</b>で実装しました。<br/>
+        セッションベースのログイン / 画像ファイルアップロードを含みます。
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">アイコンは外部リンク（CDN）を利用しています。</div>
+</section>
+
+
+    <!-- ✅ 3. MVC 패턴 및 시스템 구조 -->
+    <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 3. MVCパターン・システム構成</div>
+  </div>
+  <h2>MVCパターン・システム構成</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h3>構成の説明</h3>
+      <ul>
+        <li><b>Controller（Servlet）</b>：リクエストURLの処理、Service呼び出し、View連携</li>
+        <li><b>Service</b>：ビジネスロジック処理、DAO呼び出しの分離</li>
+        <li><b>DAO</b>：DBアクセス専任、SQL／ResultSet処理</li>
+        <li><b>View（JSP）</b>：JSTLベースの出力／UI提供</li>
+      </ul>
+      <div class="spacer"></div>
+      <h3>リクエストの流れ</h3>
+      <p class="mono" style="font-size:16px; line-height:1.6; color:rgba(233,238,252,.8);">
+        Client → Controller → Service → DAO → DB<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;JSP（View）
+      </p>
+    </div>
+
+    <div class="mediaFrame tall">
+      <img src="slides/assets/images/mvc.png" alt="MVCダイアグラム"
+           onerror="this.remove(); this.parentElement.querySelector('.placeholder').style.display='flex';" />
+      <div class="placeholder" style="display:none;">MVCダイアグラム</div>
+      <div class="caption">MVC構成ダイアグラム</div>
+    </div>
+  </div>
+</section>
+
+
+    <!-- ✅ 4. DB 설계 -->
+   <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 4. DB設計</div>
+  </div>
+  <h2>DB設計（ERD）</h2>
+
+  <div class="grid" style="grid-template-columns: 1.15fr .85fr;">
+    <div class="mediaFrame tall">
+      <img src="slides/assets/images/erd.png" alt="ERD"
+           onerror="this.remove(); this.parentElement.querySelector('.placeholder').style.display='flex';" />
+      <div class="placeholder" style="display:none;">
+        slides/assets/erd.png<br/>ERD画像を入れてください
+      </div>
+      <div class="caption">主要テーブルの関連（ERD）</div>
+    </div>
+
+    <div class="card">
+      <h3>主要テーブル</h3>
+      <ul>
+        <li>JPMEMBER：会員</li>
+        <li>JPBLOG：旅行記事</li>
+        <li>JPCOMMENT：コメント</li>
+        <li>JPBLOG_LIKE：いいね</li>
+        <li>JPBLOG_TAG：タグ</li>
+      </ul>
+      <div class="spacer"></div>
+      <h3>設計の特徴</h3>
+      <ul>
+        <li>記事中心の設計（コメント／いいね／タグ → BNO参照）</li>
+        <li><b>MEMBER と COMMENT を直接FKで結合しない</b>（退会会員のデータ保持が目的）</li>
+        <li>座標（LAT / LNG）カラムによる地図機能拡張</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+    <!-- ✅ 5. URL 설계 -->
+	<section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 5. URL設計</div>
+  </div>
+  <h2>URL設計</h2>
+  <p style="margin:0;color:rgba(233,238,252,.75);font-size:18px;">
+    機能ごとにPrefixを統一し、処理／ページを
+    <span class="mono">*.do / *pro.do</span> に分離しました。
+  </p>
+
+  <div class="urlGrid" style="margin-top:18px;">
+    <!-- 会員 -->
+    <div class="card urlCard">
+      <h3>会員（jpmem）</h3>
+      <ul class="urlList">
+        <li><span class="mono">/jpmem/login.do</span><span class="sep">·</span><span class="lbl">ログインページ</span></li>
+        <li><span class="mono">/jpmem/loginpro.do</span><span class="sep">·</span><span class="lbl">ログイン処理</span></li>
+        <li><span class="mono">/jpmem/join.do</span><span class="sep">·</span><span class="lbl">会員登録</span></li>
+        <li><span class="mono">/jpmem/mypage.do</span><span class="sep">·</span><span class="lbl">マイページ</span></li>
+        <li><span class="mono">/jpmem/edit.do</span><span class="sep">·</span><span class="lbl">情報編集</span></li>
+        <li><span class="mono">/jpmem/useridcheck.do</span><span class="tag">AJAX</span><span class="lbl">重複チェック</span></li>
+      </ul>
+      <div class="urlNote">その他：
+        <span class="mono">logout.do / editpro.do / withdraw.do</span>
+      </div>
+    </div>
+
+    <!-- 記事 -->
+    <div class="card urlCard">
+      <h3>記事（jpblog）</h3>
+      <ul class="urlList">
+        <li><span class="mono">/jpblog/list.do</span><span class="sep">·</span><span class="lbl">一覧</span></li>
+        <li><span class="mono">/jpblog/view.do</span><span class="sep">·</span><span class="lbl">詳細</span></li>
+        <li><span class="mono">/jpblog/write.do</span><span class="sep">·</span><span class="lbl">作成</span></li>
+        <li><span class="mono">/jpblog/writepro.do</span><span class="sep">·</span><span class="lbl">作成処理</span></li>
+        <li><span class="mono">/jpblog/update.do</span><span class="sep">·</span><span class="lbl">編集</span></li>
+        <li><span class="mono">/jpblog/updatepro.do</span><span class="sep">·</span><span class="lbl">編集処理</span></li>
+      </ul>
+      <div class="urlNote">その他：<span class="mono">delete.do</span></div>
+    </div>
+
+    <!-- インタラクション -->
+    <div class="card urlCard">
+      <h3>インタラクション</h3>
+      <ul class="urlList">
+        <li><span class="mono">/jpblog/commentWrite.do</span><span class="sep">·</span><span class="lbl">コメント登録</span></li>
+        <li><span class="mono">/jpblog/commentDelete.do</span><span class="sep">·</span><span class="lbl">コメント削除</span></li>
+        <li><span class="mono">/jpblog/like.do</span><span class="sep">·</span><span class="lbl">いいねトグル</span></li>
+      </ul>
+
+      <div class="urlNote">
+        ルール：
+        <span class="mono">*.do</span>（ページ） /
+        <span class="mono">*pro.do</span>（処理）
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">
+    Prefix（ドメイン）基準で分離し、保守性と拡張性を確保しました。
+  </div>
+</section>
+
+	
+
+    <!-- ✅ 6. 주요 기능 구현 상세 -->
+   <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 6. 主要機能の実装詳細</div>
+  </div>
+  <h2>主要機能の実装詳細</h2>
+  <p>主要な画面を基準に機能を説明します。</p>
+
+  <div class="twoCol" style="margin-top:18px;">
+    <div class="card">
+      <h3>会員機能</h3>
+      <ul>
+        <li>
+          セッションベース認証
+          <br>
+          <span>– ログイン状態をサーバーで管理し、権限別にアクセス制御</span>
+        </li>
+        <li>
+          会員登録 / ログイン / ログアウト
+          <br>
+          <span>– 重複IDチェックおよび入力値のバリデーションを適用</span>
+        </li>
+        <li>
+          マイページ（自分の記事 / いいね一覧）
+          <br>
+          <span>– ユーザー基準でのデータ取得および管理</span>
+        </li>
+        <li>
+          プロフィール編集
+          <br>
+          <span>– 会員情報変更後、セッションへ反映</span>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="card">
+      <h3>記事機能</h3>
+      <ul>
+        <li>
+          旅行記事のCRUD
+          <br>
+          <span>– 作成 / 閲覧 / 編集 / 削除の一連の処理を実装</span>
+        </li>
+        <li>
+          地図API連携
+          <br>
+          <span>– DB上の座標（LAT / LNG）に基づく位置情報の可視化</span>
+        </li>
+        <li>
+          画像アップロードおよびプレビュー
+          <br>
+          <span>– サーバー保存およびアップロードファイル管理</span>
+        </li>
+        <li>
+          コメント登録 / 削除、いいねトグル
+          <br>
+          <span>– 非会員アクセス制限および重複防止処理</span>
+        </li>
+        <li>
+          タグベース分類、閲覧数管理
+          <br>
+          <span>– 記事の探索性および統計データの管理</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="hint">次のスライドから画面キャプチャで機能を紹介します。</div>
+</section>
+
+
+    <!-- 6-1 로그인 화면 -->
+   <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 6. 主要機能 - ログイン</div>
+  </div>
+  <h2>ログイン画面</h2>
+
+  <div class="shotLayout">
+    <div class="mediaFrame">
+     <iframe
+	  width="100%"
+	  height="100%"
+	  src="https://www.youtube.com/embed/kLN1Bs8sX_U"
+	  title="YouTube video player"
+	  frameborder="0"
+	  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+	  allowfullscreen>
+	</iframe>
+      <div class="placeholder" style="display:none;">
+        assets/login.png<br/>ログイン画面のキャプチャを入れてください
+      </div>
+      <div class="caption">ログイン／会員登録画面</div>
+    </div>
+
+    <div class="card">
+      <h3>実装ポイント</h3>
+      <ul>
+        <li>セッションベースのログイン処理</li>
+        <li>ログイン状態に応じたメニュー／機能制御</li>
+        <li>会員登録（Join）機能の実装および入力値バリデーション</li>
+        <li>重複IDチェックによるアカウントの整合性確保</li>
+        <li>権限（Role）拡張を考慮した構造設計</li>
+        <li>ログアウト時のセッション無効化処理</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+    <!-- 6-2 글쓰기 화면 -->
+    <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 6. 主要機能 - 作成</div>
+  </div>
+  <h2>作成画面</h2>
+
+  <div class="shotLayout">
+    <div class="mediaFrame">
+      <iframe
+	  width="100%"
+	  height="100%"
+	  src="https://www.youtube.com/embed/OwVlPCw-eKU"
+	  title="YouTube video player"
+	  frameborder="0"
+	  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+	  allowfullscreen>
+	</iframe>
+      <div class="placeholder" style="display:none;">
+        assets/write.png<br/>作成画面のキャプチャを入れてください
+      </div>
+      <div class="caption">記事作成 / 画像アップロード</div>
+    </div>
+
+    <div class="card">
+      <h3>実装ポイント</h3>
+      <ul>
+        <li>記事の作成 / 編集 / 削除（CRUD）</li>
+        <li>画像アップロードおよびサーバー保存処理</li>
+        <li>カテゴリ（CITY / FESTIVAL / FOOD）の分岐</li>
+        <li>地図API連携による位置情報の可視化</li>
+        <li>座標（LAT / LNG）に基づく記事位置管理</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+    <!-- 6-3 상세 화면 -->
+   <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 6. 主要機能 - 詳細</div>
+  </div>
+  <h2>詳細画面</h2>
+
+  <div class="shotLayout">
+    <div class="mediaFrame">
+     <iframe
+	  width="100%"
+	  height="100%"
+	  src="https://www.youtube.com/embed/C0XNpZ9W-tY"
+	  title="YouTube video player"
+	  frameborder="0"
+	  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+	  allowfullscreen>
+	</iframe>
+      <div class="placeholder" style="display:none;">
+        assets/view.png<br/>詳細画面のキャプチャを入れてください
+      </div>
+      <div class="caption">記事詳細 / コメント / いいね</div>
+    </div>
+
+    <div class="card">
+      <h3>実装ポイント</h3>
+      <ul>
+        <li>閲覧数の増加処理</li>
+        <li>コメント登録 / 削除機能の実装</li>
+        <li>いいねトグル処理（重複防止ロジック設計）</li>
+        <li>タグベースの記事分類および拡張構造</li>
+        <li>Instagram UI を参考にした記事詳細（View）ページ設計</li>
+        <li>CSS衝突回避のためのエリア別レイアウト分離</li>
+        <li>本文エリアの独立スクロールによる可読性向上</li>
+        <li>コメントのページング対応による大量データ処理</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+    <!-- 6-4 마이페이지 -->
+   <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 6. 主要機能 - マイページ</div>
+  </div>
+  <h2>マイページ</h2>
+
+  <div class="shotLayout">
+    <div class="mediaFrame">
+      <iframe
+	  width="100%"
+	  height="100%"
+	  src="https://www.youtube.com/embed/QVf6YRdM88U"
+	  title="YouTube video player"
+	  frameborder="0"
+	  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+	  allowfullscreen>
+	</iframe>      <div class="placeholder" style="display:none;">
+        assets/mypage.png<br/>マイページ画面のキャプチャを入れてください
+      </div>
+      <div class="caption">マイページ（自分の記事 / いいね など）</div>
+    </div>
+
+    <div class="card">
+      <h3>実装ポイント</h3>
+      <ul>
+        <li>
+          ログインユーザー基準のデータ取得
+          <br>
+          <span>– セッション情報を基にしたパーソナライズドデータ提供</span>
+        </li>
+        <li>
+          自分が作成した記事一覧の表示
+          <br>
+          <span>– 記事ごとのコメント数を併せて表示し、活動状況を可視化</span>
+        </li>
+        <li>
+          自分のコメント / いいねした記事の管理
+          <br>
+          <span>– ユーザーの活動履歴を一画面で確認可能</span>
+        </li>
+        <li>
+          ユーザープロフィール情報の表示
+          <br>
+          <span>– 会員登録時に設定したプロフィール情報を反映</span>
+        </li>
+        <li>
+          プロフィール機能の拡張を考慮した構造
+          <br>
+          <span>– 将来的なフォロー・通知機能の拡張を想定した設計</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+    <!-- ✅ 7. 핵심 구현 사항 -->
+   <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 7. 主要な実装ポイント</div>
+  </div>
+  <h2>主要な実装ポイント</h2>
+
+  <div class="twoCol" style="margin-top:18px;">
+    <div class="card">
+      <h3>サーバー / DB</h3>
+      <ul>
+        <li>
+          セッションベースの認証処理<br>
+          <span>– ログイン状態をサーバーで管理し、権限別にアクセス制御を実装</span>
+        </li>
+        <li>
+          Oracle Sequence を活用したPK管理<br>
+          <span>– 同時リクエスト環境でも重複しないキー生成を保証</span>
+        </li>
+        <li>
+          複数テーブルの関連設計（コメント／いいね／タグ）<br>
+          <span>– 記事中心の構造で拡張性とデータ整合性を考慮</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>View / UI</h3>
+      <ul>
+        <li>
+          JSTL + EL によるデータレンダリング<br>
+          <span>– JSPでのJavaコード使用を最小限に抑え、可読性を向上</span>
+        </li>
+        <li>
+          カテゴリ分岐：CITY / FESTIVAL / FOOD<br>
+          <span>– 単一構造で多様なコンテンツを管理できるよう設計</span>
+        </li>
+        <li>
+          共通CSS / ページ別CSSの分離<br>
+          <span>– スタイル衝突を防ぎ、保守性を高める構成</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+
+    <!-- ✅ 9. 현재 한계 및 개선 방향 + 지도 API -->
+   <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 8. 現在の課題と改善方針</div>
+  </div>
+  <h2>現在の課題と改善方針</h2>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr; margin-top:18px;">
+
+    <!-- 現在の課題 -->
+    <div class="card">
+      <h3>現状（課題）</h3>
+      <ul>
+        <li>コメント／いいね操作時にページ全体が再読み込みされる</li>
+        <li>UX低下：インタラクションが即時反映されず、操作の流れが途切れる</li>
+        <li>サーバーリクエスト増加：全体再レンダリング／クエリ再実行による非効率</li>
+        <li>コメント数増加に伴う画面ロード／スクロールの体感性能低下</li>
+      </ul>
+
+      <div class="spacer"></div>
+      <h3>原因</h3>
+      <ul>
+        <li>JSPベースのページレンダリング中心構造</li>
+        <li>コメント／いいね処理が「ページ単位のリクエスト」に集約されている</li>
+      </ul>
+    </div>
+
+    <!-- 改善 + 将来機能 -->
+    <div class="card">
+      <h3>改善計画</h3>
+      <ul>
+        <li>AJAX導入：コメント／いいねを非同期処理し即時反映</li>
+        <li>JSONレスポンスによる「必要な領域のみ」の部分更新</li>
+        <li>RESTエンドポイント分離による機能単位の拡張性確保</li>
+        <li>重複防止／同時実行を考慮したいいねトグルロジックの安定化</li>
+      </ul>
+
+      <div class="spacer"></div>
+      <h3>今後の追加機能</h3>
+      <ul>
+        <li>フォロー／フォロワー機能：ユーザー関係に基づくフィード構成</li>
+        <li>マイフィード（タイムライン）：フォロー中ユーザーの記事一覧</li>
+        <li>通知機能：いいね／コメント／フォローのイベント通知</li>
+      </ul>
+
+      <div class="hint">
+        目標：「リロード不要のUX」＋「SNS型機能を拡張可能な構造」
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+    <!-- ✅ 10. 배운 점과 성장 -->
+   <section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 9. 学んだことと成長</div>
+  </div>
+  <h2>学んだことと成長</h2>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr; margin-top:18px;">
+
+    <!-- 左：学び -->
+    <div class="card">
+      <h3>学んだことと成長</h3>
+      <ul>
+        <li>
+          MVCリクエストフローの理解
+          <br>
+          <span>– Controller → Service → DAO → View の構造を実感</span>
+        </li>
+        <li>
+          設計の重要性を認識
+          <br>
+          <span>– 機能追加時のDB構造変更コストを体験</span>
+        </li>
+        <li>
+          タグ機能の実装経験
+          <br>
+          <span>– 多対多関係設計の難しさを学習</span>
+        </li>
+        <li>
+          問題解決能力の向上
+          <br>
+          <span>– トラブル原因の分析と構造的改善を経験</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 右：要約 -->
+    <div class="card">
+      <h3>一言でまとめると</h3>
+      <ul>
+        <li>「MVC構造をなぞる段階から」</li>
+        <li>→「自ら設計し、つなげられる段階へ成長」</li>
+      </ul>
+
+      <div class="spacer"></div>
+
+      <h3>次の目標</h3>
+      <ul>
+        <li>AJAXベースの非同期処理導入</li>
+        <li>外部APIの積極的な活用</li>
+        <li>設計中心の開発スタイルを継続</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+
+
+    <!-- ✅ 11. まとめ -->
+<section class="slide">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> 10. まとめ</div>
+  </div>
+  <h2>まとめ</h2>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr; margin-top:18px;">
+    <div class="card">
+      <ul>
+        <li>JPTRIPGRAMは実運用可能な旅行ブログサービス</li>
+        <li>個人開発で企画 → 設計 → 実装 → デバッグまで一貫して経験</li>
+        <li>今後はフレームワークベースでの拡張を予定</li>
+      </ul>
+      <div class="spacer"></div>
+      <p style="font-size:22px; font-weight:600;">
+        本プロジェクトを足がかりに
+      </p>
+      <p style="font-size:22px; font-weight:600;">
+        さらに完成度の高いサービスとして、またお目にかかります。
+      </p>
+      <div class="spacer"></div>
+      <p style="font-size:20px; color:rgba(233,238,252,.85);">
+        ご清聴ありがとうございました。Q&amp;A
+      </p>
+    </div>
+
+    <div class="mediaFrame tall">
+      <img src="slides/assets/images/LOGO.png" alt="エンディング画像（任意）"
+           onerror="this.remove(); this.parentElement.querySelector('.placeholder').style.display='flex';" />
+      <div class="placeholder" style="display:none;">
+        assets/ending.png（任意）<br/>エンディング用画像（メインキャプチャの再利用も可）
+      </div>
+    </div>
+  </div>
+</section>
+
+
+    <!-- ✅ 공통 Footer / Controls -->
+    <div class="footer">
+      <div class="controls">
+        <button id="prevBtn">← Prev</button>
+        <button id="nextBtn">Next →</button>
+        <button id="fsBtn">Full (F)</button>
+        <span style="margin-left:10px;color:var(--muted)">
+          키: <span class="kbd">←</span><span class="kbd">→</span> <span class="kbd">Space</span> <span class="kbd">F</span>
+        </span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="progress"><div class="bar" id="bar"></div></div>
+        <div><span id="idx">1</span> / <span id="total">1</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const total = slides.length;
+    const idxEl = document.getElementById('idx');
+    const totalEl = document.getElementById('total');
+    const bar = document.getElementById('bar');
+    totalEl.textContent = total;
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    let current = 0;
+
+    function pauseAllVideos(){
+      document.querySelectorAll('video').forEach(v => { try{ v.pause(); }catch(e){} });
+    }
+
+    function show(n){
+      n = clamp(n, 0, total-1);
+      pauseAllVideos();
+      slides.forEach((s,i)=> s.classList.toggle('active', i===n));
+      idxEl.textContent = (n+1);
+      bar.style.width = ((n+1)/total*100) + '%';
+      location.hash = '#' + (n+1);
+      current = n;
+    }
+
+    function next(){ show(current+1); }
+    function prev(){ show(current-1); }
+
+    document.getElementById('nextBtn').addEventListener('click', next);
+    document.getElementById('prevBtn').addEventListener('click', prev);
+
+    function toggleFull(){
+      if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    }
+    document.getElementById('fsBtn').addEventListener('click', toggleFull);
+
+    window.addEventListener('keydown', (e)=>{
+      const k = e.key;
+      if(k === 'ArrowRight' || k === ' ' || k === 'PageDown'){ e.preventDefault(); next(); }
+      if(k === 'ArrowLeft' || k === 'PageUp'){ e.preventDefault(); prev(); }
+      if(k.toLowerCase() === 'f'){ e.preventDefault(); toggleFull(); }
+    });
+
+    function initFromHash(){
+      const h = location.hash.replace('#','');
+      const n = parseInt(h, 10);
+      if(!Number.isNaN(n)) show(n-1);
+      else show(0);
+    }
+    window.addEventListener('hashchange', initFromHash);
+    initFromHash();
+  </script>
+</body>
+</html>
