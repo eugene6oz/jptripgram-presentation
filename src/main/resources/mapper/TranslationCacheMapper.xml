@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.anime.mapper.TranslationCacheMapper">
+
+    <select id="findTitle" resultType="string">
+        SELECT title
+        FROM anime_translations
+        WHERE mal_anime_id = #{malId}
+          AND lang = #{lang}
+    </select>
+
+    <select id="findSynopsis" resultType="string">
+        SELECT synopsis
+        FROM anime_translations
+        WHERE mal_anime_id = #{malId}
+          AND lang = #{lang}
+    </select>
+
+    <insert id="upsert">
+        INSERT INTO anime_translations (mal_anime_id, lang, title, synopsis)
+        VALUES (#{malId}, #{lang}, #{title}, #{synopsis})
+        ON DUPLICATE KEY UPDATE
+            title = VALUES(title),
+            synopsis = VALUES(synopsis),
+            updated_at = CURRENT_TIMESTAMP
+    </insert>
+
+</mapper>

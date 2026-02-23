@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anime.mapper.ReviewMapper">
+
+  <sql id="reviewColumns">
+    r.id,
+    r.user_id       AS userId,
+    r.mal_anime_id  AS malAnimeId,
+    r.title,
+    r.content,
+    r.report_count  AS reportCount,
+    r.created_at    AS createdAt,
+    r.updated_at    AS updatedAt,
+    u.username      AS username,
+    u.nickname      AS nickname,
+    rt.score        AS score
+  </sql>
+
+  <sql id="reviewJoins">
+    JOIN  users   u  ON u.id = r.user_id
+    LEFT JOIN ratings rt ON rt.user_id = r.user_id
+                        AND rt.mal_anime_id = r.mal_anime_id
+  </sql>
+
+  <select id="findByUser" resultType="com.anime.domain.ReviewDto">
+    SELECT <include refid="reviewColumns"/>
+    FROM reviews r <include refid="reviewJoins"/>
+    WHERE r.user_id = #{userId}
+    ORDER BY r.created_at DESC
+  </select>
+
+  <select id="findByAnime" resultType="com.anime.domain.ReviewDto">
+    SELECT <include refid="reviewColumns"/>
+    FROM reviews r <include refid="reviewJoins"/>
+    WHERE r.mal_anime_id = #{malAnimeId}
+    ORDER BY r.created_at DESC
+  </select>
+
+  <select id="findById" resultType="com.anime.domain.ReviewDto">
+    SELECT <include refid="reviewColumns"/>
+    FROM reviews r <include refid="reviewJoins"/>
+    WHERE r.id = #{id}
+  </select>
+
+  <select id="findDetail" resultType="com.anime.domain.ReviewDetailDto">
+    SELECT <include refid="reviewColumns"/>
+    FROM reviews r <include refid="reviewJoins"/>
+    WHERE r.id = #{id}
+  </select>
+
+  <select id="findRecent" resultType="com.anime.domain.ReviewDto">
+    SELECT <include refid="reviewColumns"/>
+    FROM reviews r <include refid="reviewJoins"/>
+    ORDER BY r.created_at DESC
+    LIMIT #{limit}
+  </select>
+
+  <!-- 관리자: 전체 리뷰 목록 (신고 많은 순) -->
+  <select id="findAll" resultType="com.anime.domain.ReviewDto">
+    SELECT <include refid="reviewColumns"/>
+    FROM reviews r <include refid="reviewJoins"/>
+    ORDER BY r.report_count DESC, r.created_at DESC
+  </select>
+
+  <insert id="insert">
+    INSERT INTO reviews (user_id, mal_anime_id, title, content)
+    VALUES (#{userId}, #{malAnimeId}, #{title}, #{content})
+  </insert>
+
+  <update id="updateByOwner">
+    UPDATE reviews
+    SET title = #{title}, content = #{content}, updated_at = CURRENT_TIMESTAMP(3)
+    WHERE id = #{id} AND user_id = #{userId}
+  </update>
+
+  <delete id="deleteByOwner">
+    DELETE FROM reviews WHERE id = #{id} AND user_id = #{userId}
+  </delete>
+
+  <delete id="deleteById">
+    DELETE FROM reviews WHERE id = #{id}
+  </delete>
+
+  <!-- 신고: report_count + 1 -->
+  <update id="incrementReportCount">
+    UPDATE reviews SET report_count = report_count + 1 WHERE id = #{id}
+  </update>
+
+  <!-- 관리자: 신고수 초기화 -->
+  <update id="resetReportCount">
+    UPDATE reviews SET report_count = 0 WHERE id = #{id}
+  </update>
+
+</mapper>

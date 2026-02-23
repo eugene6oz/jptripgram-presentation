@@ -1,0 +1,27 @@
+# Maven
+/target/
+
+# IntelliJ
+.idea/
+*.iml
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# Mac
+.DS_Store
+
+# Logs
+*.log
+
+# Local config
+application-local.yml
+application-dev.yml
+
+application-local.properties
+.env# secrets
+.env
+application.properties
+src/main/resources/application.properties

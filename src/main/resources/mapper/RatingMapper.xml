@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.anime.mapper.RatingMapper">
+
+  <insert id="upsert">
+    INSERT INTO ratings(user_id, mal_anime_id, score)
+    VALUES(#{userId}, #{malId}, #{score})
+    ON DUPLICATE KEY UPDATE
+      score = VALUES(score),
+      updated_at = CURRENT_TIMESTAMP(3)
+  </insert>
+
+  <delete id="deleteByUserAndAnime">
+    DELETE FROM ratings
+    WHERE user_id = #{userId}
+      AND mal_anime_id = #{malId}
+  </delete>
+
+  <select id="findMyScore" resultType="int">
+    SELECT score
+    FROM ratings
+    WHERE user_id = #{userId}
+      AND mal_anime_id = #{malId}
+    LIMIT 1
+  </select>
+
+</mapper>

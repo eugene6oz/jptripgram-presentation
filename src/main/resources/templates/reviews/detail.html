@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${review.title}">리뷰 상세</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+  <link rel="stylesheet" th:href="@{/css/review.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: siteHeader}"></div>
+
+<main class="container" style="max-width: 1000px; padding: 24px 0;">
+  <div class="box" style="padding:0; overflow:hidden;">
+
+    <!-- ✅ BOOK LAYOUT -->
+    <div style="
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      min-height: 560px;
+      background: rgba(255,255,255,0.02);
+    ">
+
+      <!-- ───────── 왼쪽: 애니 포스터(이미지만) ───────── -->
+      <div style="
+        padding:24px;
+        border-right: 1px solid rgba(255,255,255,.08);
+        display:flex;
+        align-items:flex-start;
+        justify-content:center;
+        background: rgba(0,0,0,.06);
+      ">
+
+        <!-- anime 있으면 포스터 -->
+        <img th:if="${anime != null}"
+             th:src="${anime.images != null and anime.images.jpg != null and anime.images.jpg.largeImageUrl != null
+                      ? anime.images.jpg.largeImageUrl : ''}"
+             alt="anime"
+             style="
+               width:100%;
+               max-width: 320px;
+               height:auto;
+               aspect-ratio: 2/3;
+               object-fit: cover;
+               border-radius: 18px;
+               background: rgba(255,255,255,.06);
+               box-shadow: 0 18px 40px rgba(0,0,0,.45);
+             " />
+
+        <!-- anime 없으면 fallback -->
+        <div th:if="${anime == null}"
+             class="muted"
+             style="width:100%; max-width:320px; aspect-ratio:2/3;
+                    display:flex; align-items:center; justify-content:center;
+                    border-radius:18px; border:1px dashed rgba(255,255,255,.15);">
+          NO IMAGE
+        </div>
+      </div>
+
+      <!-- ───────── 오른쪽: 리뷰 글(전부) ───────── -->
+      <div style="padding:24px; display:flex; flex-direction:column; gap:14px; min-width:0;">
+
+        <!-- 헤더(제목 + 버튼들) -->
+        <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
+          <div style="min-width:0;">
+            <h2 th:text="${review.title}" style="margin:0; font-size:22px; line-height:1.2;"></h2>
+
+            <div class="muted" style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+              <span>
+                <span th:text="#{review.author}">작성자</span>:
+                <b th:text="${review.nickname != null ? review.nickname : review.username}">user</b>
+              </span>
+              <span class="sep">·</span>
+              <span th:text="${#temporals.format(review.createdAt,'yyyy-MM-dd HH:mm')}">date</span>
+            </div>
+
+            <!-- 리뷰 평점 -->
+            <div th:if="${review.score != null}" class="rating-view" style="margin-top:10px;">
+              <span class="rating-num" th:text="${(review.score / 2.0)} + ' / 5.0'">4.5 / 5.0</span>
+              <span class="stars">
+                <span th:each="i : ${#numbers.sequence(1,5)}"
+                      th:classappend="${review.score >= i*2 ? ' star-full' : (review.score == i*2-1 ? ' star-half' : ' star-empty')}"
+                      class="star">★</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- 수정/삭제/신고 -->
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end;">
+
+            <div th:if="${canEdit}">
+              <a class="btnGhost"
+                 th:href="@{|/reviews/${review.id}/edit?lang=${lang}|}"
+                 th:text="#{review.edit}">수정</a>
+
+              <form th:action="@{|/reviews/${review.id}/delete?lang=${lang}|}"
+                    method="post" style="display:inline;">
+                <button class="btnRed" type="submit"
+                        th:attr="onclick=|return confirm('#{review.deleteConfirm}')|"
+                        th:text="#{review.delete}">
+                  삭제
+                </button>
+              </form>
+            </div>
+
+            <!-- 신고: 로그인 사용자 + 본인 글 아닐 때 -->
+            <div sec:authorize="isAuthenticated()" th:if="${!canEdit}">
+              <span th:if="${reported}" style="font-size:13px; color:var(--muted);"
+                    th:text="#{review.report.complete}">✅ 신고 완료</span>
+
+              <form th:if="${!reported}"
+                    th:action="@{|/reviews/${review.id}/report?lang=${lang}|}"
+                    method="post" style="display:inline;"
+                    th:attr="onsubmit=|return confirm('#{review.report.confirm}')|">
+                <button type="submit" class="btn-report" th:text="#{review.report}">🚨 신고</button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 신고수 (관리자만) -->
+        <div sec:authorize="hasRole('ADMIN')"
+             th:if="${review.reportCount != null and review.reportCount > 0}"
+             style="font-size:13px; color:#fc8181;">
+          <span th:text="#{review.report.count}">⚠ 신고</span>
+          <b th:text="${review.reportCount}">0</b>
+          <span th:text="#{review.report.unit}">건</span>
+        </div>
+
+        <!-- 신고 완료 알림 -->
+        <div th:if="${param.reported}"
+             style="padding:10px 14px;
+                    background:rgba(229,62,62,.12); border:1px solid rgba(229,62,62,.3);
+                    border-radius:10px; font-size:13px; color:#fc8181;"
+             th:text="#{review.report.done}">
+          신고가 접수되었습니다.
+        </div>
+
+        <hr style="margin:10px 0; opacity:.15;">
+
+        <!-- 본문 -->
+        <div class="review-body" style="flex:1;">
+          <p th:text="${review.content}"
+             style="white-space:pre-wrap; margin:0; line-height:1.7; font-size:15px;"></p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>
+

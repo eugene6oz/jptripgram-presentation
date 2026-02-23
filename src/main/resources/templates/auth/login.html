@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="#{login.title}">로그인</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+  <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: siteHeader}"></div>
+
+<main class="container" style="max-width: 900px; padding: 24px 0;">
+  <div class="auth-wrap">
+    <div class="box">
+      <h1 class="auth-title">
+        <span>🔐</span>
+        <span th:text="#{login.title}">로그인</span>
+      </h1>
+
+      <p class="auth-sub" th:text="#{login.subtitle}">
+        계정으로 로그인해 서비스를 이용하세요.
+      </p>
+
+      <!-- ✅ 메시지 -->
+      <div th:if="${errorMsg}" class="auth-msg error" th:text="#{${errorMsg}}"></div>
+	  <div th:if="${logoutMsg}" class="auth-msg success" th:text="#{${logoutMsg}}"></div>
+      <div th:if="${param.registered}" class="auth-msg success" th:text="#{login.registered}"></div>
+      <div th:if="${param.withdrawn}" class="auth-msg success" th:text="#{login.withdrawn}"></div>
+
+      <form th:action="@{/login}" method="post" style="margin-top: 18px;">
+        <div class="auth-field">
+          <label class="auth-label" for="username" th:text="#{login.username}">아이디</label>
+          <input class="auth-input" type="text" id="username" name="username"
+                 th:attr="placeholder=#{login.username.placeholder}"
+                 required autofocus>
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-label" for="password" th:text="#{login.password}">비밀번호</label>
+          <input class="auth-input" type="password" id="password" name="password"
+                 th:attr="placeholder=#{login.password.placeholder}"
+                 required>
+        </div>
+
+        <div class="auth-actions">
+          <button class="auth-btn" type="submit" th:text="#{login.button}">로그인</button>
+        </div>
+      </form>
+
+      <div class="auth-links">
+        <span th:text="#{login.noAccount}">계정이 없나요?</span>
+        <a th:href="@{/register}" th:text="#{login.register.link}">회원가입</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

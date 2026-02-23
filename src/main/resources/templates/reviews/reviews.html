@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title th:text="${mode=='create'} ? #{review.create} : #{review.edit}">리뷰</title>
+<link rel="stylesheet" th:href="@{/css/main.css}">
+<link rel="stylesheet" th:href="@{/css/review.css}">
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: siteHeader}"></div>
+
+	<main class="review-page">
+		<div class="review-hero">
+			<div>
+				<h1 th:text="${mode=='create'} ? #{review.create} : #{review.edit}"></h1>
+				<div class="sub" th:text="#{review.sub}"></div>
+			</div>
+		</div>
+
+		<div class="review-card">
+			<!-- (선택) 애니 미니 카드: anime가 model에 있으면 -->
+			<div class="anime-mini" th:if="${anime != null}">
+				<img th:src="${anime.images.jpg.largeImageUrl}" alt="poster">
+				<div>
+					<p class="title" th:text="${anime.title}">title</p>
+					<div class="meta" th:text="#{review.anime.desc}"></div>
+				</div>
+			</div>
+
+			<div class="review-card-inner">
+				<form
+					th:action="${mode=='create'} ? @{/reviews/new(lang=${lang})} : @{/reviews/{id}/edit(id=${reviewId}, lang=${lang})}"
+					method="post" th:object="${form}">
+					<input type="hidden" th:field="*{malAnimeId}">
+
+					<div class="form-row">
+						<label th:text="#{review.title.label}">제목</label> <input
+							id="rvTitle" type="text" th:field="*{title}" required
+							maxlength="200">
+						<div class="form-help">
+							<span th:text="#{review.title.help}"></span> <span
+								id="titleCount">0/200</span>
+						</div>
+					</div>
+
+					<div class="form-row">
+						<label th:text="#{review.content.label}">내용</label>
+						<textarea id="rvContent" th:field="*{content}" required></textarea>
+						<div class="form-help">
+							<span th:text="#{review.content.help}"></span> <span
+								id="contentCount">0</span>
+						</div>
+					</div>
+
+					<!-- ⭐ 평점 UI (0.5단위) -->
+					<div class="form-row">
+						<label th:text="#{review.score.label}">내 평점</label>
+
+						<!-- 서버로 전송될 score(1~10). 선택 안 하면 null -->
+						<input type="hidden" th:field="*{score}" id="scoreInput">
+
+						<!-- JS가 별 5개를 생성해서 넣음 -->
+						<div id="starRating" class="star-rating"></div>
+
+						<div class="form-help"
+							style="display: flex; justify-content: space-between; gap: 12px;">
+							<span id="starText" class="muted"
+								th:text="#{review.score.optional}"></span>
+							<button type="button" class="btnGhost" id="starClear"
+								th:text="#{review.score.clear}"></button>
+						</div>
+					</div>
+
+
+					<div class="review-actions">
+						<button class="btnRed" type="submit"
+							th:text="${mode=='create'} ? #{review.submit.create} : #{review.submit.edit}"></button>
+						<a class="btnGhost"
+							th:href="@{|/anime/${form.malAnimeId}?lang=${lang}|}"
+							th:text="#{common.cancel}"></a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+
+	<script th:inline="javascript">
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* ===========================
+     🌍 i18n 메시지 주입
+     =========================== */
+  const optionalText = /*[[#{review.score.optional}]]*/ "Optional";
+  const ratingLabel  = /*[[#{review.score.label}]]*/ "Rating";
+  const charLabel    = /*[[#{review.content.count}]]*/ "chars";
+
+  /* ===========================
+     1️⃣ 글자수 카운터 기능
+     =========================== */
+
+  const titleInput = document.getElementById("rvTitle");
+  const contentInput = document.getElementById("rvContent");
+
+  const titleCounter = document.getElementById("titleCount");
+  const contentCounter = document.getElementById("contentCount");
+
+  function updateCounters() {
+    if (titleInput && titleCounter) {
+      const len = titleInput.value ? titleInput.value.length : 0;
+      titleCounter.textContent = `${len}/200`;
+    }
+
+    if (contentInput && contentCounter) {
+      const len = contentInput.value ? contentInput.value.length : 0;
+      contentCounter.textContent = len + " " + charLabel;
+    }
+  }
+
+  if (titleInput) titleInput.addEventListener("input", updateCounters);
+  if (contentInput) contentInput.addEventListener("input", updateCounters);
+
+  updateCounters();
+
+
+  /* ===========================
+     2️⃣ ⭐ 별점(0.5단위)
+     =========================== */
+
+  const starContainer = document.getElementById("starRating");
+  const scoreInput = document.getElementById("scoreInput");
+  const starText = document.getElementById("starText");
+  const starClear = document.getElementById("starClear");
+
+  if (!starContainer || !scoreInput) return;
+
+  let currentScore = scoreInput.value
+      ? parseInt(scoreInput.value, 10)
+      : 0;
+
+  // 별 5개 생성
+  starContainer.innerHTML = "";
+  for (let i = 1; i <= 5; i++) {
+    const span = document.createElement("span");
+    span.className = "star";
+    span.textContent = "★";
+    span.dataset.index = String(i);
+    starContainer.appendChild(span);
+  }
+
+  const stars = starContainer.querySelectorAll(".star");
+
+  // 점수 텍스트 변환 (i18n 적용)
+  function scoreToText(score10) {
+    if (!score10) return optionalText;
+    return ratingLabel + " " +
+           (score10 / 2).toFixed(1) +
+           " / 5.0";
+  }
+
+  function render(score10) {
+    stars.forEach((star, i) => {
+      const idx = i + 1;
+      star.classList.remove("active", "half");
+
+      if (score10 >= idx * 2) {
+        star.classList.add("active");
+      } else if (score10 === idx * 2 - 1) {
+        star.classList.add("half");
+      }
+    });
+
+    if (starText) {
+      starText.textContent = scoreToText(score10);
+    }
+  }
+
+  function calcScoreFromMouse(starEl, e) {
+    const rect = starEl.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const half = x < rect.width / 2;
+    const idx = parseInt(starEl.dataset.index, 10);
+    return half ? idx * 2 - 1 : idx * 2;
+  }
+
+  stars.forEach(star => {
+
+    star.addEventListener("mousemove", (e) => {
+      const temp = calcScoreFromMouse(star, e);
+      render(temp);
+    });
+
+    star.addEventListener("click", (e) => {
+      currentScore = calcScoreFromMouse(star, e);
+      scoreInput.value = String(currentScore);
+      render(currentScore);
+    });
+
+  });
+
+  starContainer.addEventListener("mouseleave", () => {
+    render(currentScore);
+  });
+
+  if (starClear) {
+    starClear.addEventListener("click", () => {
+      currentScore = 0;
+      scoreInput.value = "";
+      render(0);
+    });
+  }
+
+  render(currentScore);
+
+});
+</script>
+
+
+</body>
+</html>

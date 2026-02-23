@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{search.result.title}">검색 결과</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: siteHeader}"></div>
+
+<main class="container">
+
+    <section class="search-bar-section">
+        <form th:action="@{/search}" method="get" class="search-form">
+            <input type="hidden" name="lang" th:value="${lang}" />
+            <input type="text"
+                   name="q"
+                   th:value="${query}"
+                   th:attr="placeholder=#{search.placeholder}"
+                   class="search-input" />
+            <button type="submit" class="btnRed" th:text="#{search.button}">검색</button>
+        </form>
+    </section>
+
+    <h1 th:text="#{search.result.prefix} + ' ' + ${query}"></h1>
+
+    <div th:if="${#lists.isEmpty(animeList)}">
+        <p th:text="#{search.empty}">검색 결과가 없습니다.</p>
+    </div>
+
+    <div class="grid" th:if="${!#lists.isEmpty(animeList)}">
+        <div class="card" th:each="anime : ${animeList}"
+             th:attr="data-mal-id=${anime.malId},
+                      data-title-ja=${anime.titleJapanese},
+                      data-title-en=${anime.title}">
+
+            <div class="poster">
+                <img th:src="${anime.images.jpg.imageUrl}"
+                     style="width:100%; height:100%; object-fit:cover;" alt="poster">
+            </div>
+
+            <div class="card-body">
+                <!-- ✅ 번역 대상 요소: JS가 data 속성 읽어서 교체 -->
+                <p class="title anime-title"
+                   th:text="${(anime.titleJapanese != null && !anime.titleJapanese.isEmpty())
+                             ? anime.titleJapanese : anime.title}"></p>
+
+                <div class="meta">
+                    <span th:text="${anime.score == null ? '⭐ -' : '⭐ ' + anime.score}"></span>
+                    <span>·</span>
+                    <a th:href="@{|/anime/${anime.malId}?lang=${lang}|}"
+                       th:text="#{search.detail}">상세</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const currentLang = [[${lang}]];
+    const query       = [[${query}]];
+
+    // ─────────────────────────────────────────────────
+    // 헤더 언어 버튼: lang만 바꾸되 q 파라미터 유지
+    // ─────────────────────────────────────────────────
+    document.querySelectorAll('a.btn-ghost[href*="lang="]').forEach(btn => {
+        const url = new URL(btn.href, location.origin);
+        const newLang = url.searchParams.get('lang');
+        if (!newLang) return;
+
+        // 현재 URL의 파라미터를 유지하면서 lang만 교체
+        const newUrl = new URL(location.href);
+        newUrl.searchParams.set('lang', newLang);
+        btn.href = newUrl.toString();
+    });
+
+    // ─────────────────────────────────────────────────
+    // 비동기 번역: lang 변경 시 제목만 교체 (페이지 리로드 없음)
+    // ─────────────────────────────────────────────────
+    function applyTitles(lang) {
+        document.querySelectorAll('.card[data-mal-id]').forEach(card => {
+            const titleEl = card.querySelector('.anime-title');
+            if (!titleEl) return;
+
+            if (lang === 'ja') {
+                titleEl.textContent = card.dataset.titleJa || card.dataset.titleEn;
+            } else if (lang === 'en') {
+                titleEl.textContent = card.dataset.titleEn;
+            } else {
+                // ko: 서버에서 번역된 값이 이미 data-title-en에 없으므로
+                // API 호출로 번역 요청
+                const malId = card.dataset.malId;
+                const source = card.dataset.titleJa || card.dataset.titleEn;
+                fetchTranslation(malId, source, lang, titleEl);
+            }
+        });
+    }
+
+    // 번역 API 호출 (캐시 우선)
+    const translationCache = {};
+
+    function fetchTranslation(malId, source, lang, el) {
+        const key = malId + '_' + lang;
+        if (translationCache[key]) {
+            el.textContent = translationCache[key];
+            return;
+        }
+
+        fetch(`/api/translate?malId=${malId}&lang=${lang}&text=${encodeURIComponent(source)}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.translated) {
+                    translationCache[key] = data.translated;
+                    el.textContent = data.translated;
+                }
+            })
+            .catch(() => {}); // 실패 시 원문 유지
+    }
+
+    // 페이지 로드 시 현재 lang 적용
+    if (currentLang !== 'en') {
+        applyTitles(currentLang);
+    }
+    /*]]>*/
+</script>
+
+</body>
+</html>

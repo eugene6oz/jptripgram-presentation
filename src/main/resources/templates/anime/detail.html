@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title th:text="${lang == 'ja'
+      ? ((anime.titleJapanese != null && !anime.titleJapanese.isEmpty()) ? anime.titleJapanese : anime.title)
+      : anime.title}">Detail</title>
+
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+  <link rel="stylesheet" th:href="@{/css/detail.css}">
+  
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: siteHeader}"></div>
+
+<main class="container detail-wrap">
+
+  <div class="detail-grid">
+
+    <div class="posterBox">
+      <img th:src="${anime.images.jpg.largeImageUrl}" alt="poster">
+    </div>
+
+    <div class="box">
+      <div class="titleLine">
+        <!-- ✅ 큰 제목: ja면 일본어 우선, ko/en이면 (번역/원문) anime.title -->
+        <h1 class="jpTitle"
+            th:text="${lang == 'ja'
+                ? ((anime.titleJapanese != null && !anime.titleJapanese.isEmpty()) ? anime.titleJapanese : anime.title)
+                : anime.title}">
+          タイトル
+        </h1>
+
+        <!-- 보조 제목(작게): ja면 영어(title), ko/en이면 일본어(titleJapanese) -->
+        <p class="enTitle" th:if="${lang == 'ja'}" th:text="${anime.title}">English Title</p>
+        <p class="enTitle" th:if="${lang != 'ja'}"
+           th:text="${(anime.titleJapanese != null && !anime.titleJapanese.isEmpty()) ? anime.titleJapanese : ''}">
+          Japanese Title
+        </p>
+      </div>
+
+      <div class="chips">
+        <span class="chip" th:text="${anime.score == null ? '⭐ -' : '⭐ ' + anime.score}">⭐</span>
+        <span class="chip" th:text="${anime.episodes == null ? 'EP ?' : 'EP ' + anime.episodes}">EP</span>
+        <span class="chip" th:text="${anime.status}">status</span>
+        <span class="chip" th:each="g : ${anime.genres}" th:text="${g.name}">Genre</span>
+        <span class="chip" th:each="s : ${anime.studios}" th:text="${s.name}">Studio</span>
+      </div>
+
+      <div class="actions">
+       <button class="btnRed" type="button"
+        id="favBtn"
+        th:attr="data-mal-id=${anime.malId}"
+        th:text="${isFavorite} ? #{detail.favoriteOff} : #{detail.favorite}">
+		</button>
+		<a class="btnGhost" href="/search" th:text="#{detail.toSearch}">검색으로</a>
+      </div>
+
+		<h3 style="margin:18px 0 8px;" th:text="#{detail.synopsis}">줄거리</h3>
+      <div class="synopsis" th:text="${anime.synopsis}">synopsis...</div>
+      
+     <section class="chatbot-section">
+		  <div class="chatbot-card">
+		    <div class="chatbot-head">
+		      <h3 class="chatbot-title">
+			  🤖 <span th:text="#{chat.title}">AI 챗봇</span>
+			  <span class="chatbot-badge">anime</span>
+			</h3>
+		
+		      <div class="chatbot-controls">
+		        <select id="chatLang" class="chatbot-select">
+		          <option value="ko" th:selected="${lang=='ko'}">KO</option>
+		          <option value="ja" th:selected="${lang=='ja'}">JA</option>
+		          <option value="en" th:selected="${lang=='en'}">EN</option>
+		        </select>
+		        <button id="chatClear" type="button" class="chatbot-clear" th:text="#{chat.clear}">지우기</button>
+		      </div>
+		    </div>
+		
+		    <div class="chatbot-body">
+		      <div id="chatBox" class="chatbot-box"></div>
+		
+		      <div class="chatbot-foot">
+		      <input id="chatInput" class="chatbot-input" type="text"
+     				  th:attr="placeholder=#{chat.placeholder}" />
+      			 <button id="chatSend" class="chatbot-send" type="button" th:text="#{chat.send}">전송</button>
+		      </div>
+		    </div>
+		  </div>
+		</section> <!-- chatbot-section 닫기 -->
+
+		<hr style="margin: 24px 0;">
+		
+		<section class="section" style="margin-top:24px;">
+		  <div class="section-title">
+		  <h2 th:text="#{review.title}">리뷰</h2>
+		  <span th:text="#{review.count(${#lists.size(reviews)})}">0개</span>
+		  </div>
+		
+		  <div style="margin: 10px 0 18px;">
+		    <a class="btnRed" th:if="${me != null}"
+			   th:href="@{|/reviews/new?malId=${anime.malId}&lang=${lang}|}"
+			   th:text="#{review.write}">리뷰 쓰기</a>
+			<a class="btnGhost" th:if="${me == null}"
+			   th:href="@{/login}"
+			   th:text="#{review.writeLogin}">로그인하고 리뷰 쓰기</a>
+		  </div>
+		
+			<p th:if="${#lists.isEmpty(reviews)}" class="muted" th:text="#{review.empty}">
+			</p>
+		
+		  <div class="review-list" th:if="${!#lists.isEmpty(reviews)}">
+		    <article class="review-item" th:each="rv : ${reviews}">
+		      <div class="review-head">
+		        <div>
+		          <a class="review-title"
+		             th:href="@{|/reviews/${rv.id}?lang=${lang}|}"
+		             th:text="${rv.title}">title</a>
+		
+		          <div class="review-meta">
+		            <b th:text="${rv.nickname != null ? rv.nickname : rv.username}">user</b>
+		            <span class="sep">·</span>
+		            <span th:text="${#temporals.format(rv.createdAt,'yyyy-MM-dd HH:mm')}">date</span>
+		            <span class="sep">·</span>
+		          </div>
+		        </div>
+		
+		        <div th:if="${rv.score != null}" class="review-score">
+		          <span class="review-score-num" th:text="${(rv.score/2.0)}">4.5</span>
+		          <span class="review-stars">
+		            <span th:each="i : ${#numbers.sequence(1,5)}"
+		                  class="star"
+		                  th:classappend="${rv.score >= i*2 ? ' star-full' : (rv.score == i*2-1 ? ' star-half' : ' star-empty')}">★</span>
+		          </span>
+		        </div>
+		      </div>
+		
+		
+		      <div class="review-actions"
+		           th:if="${me != null and (rv.userId == me or isAdmin)}">
+		           <a class="btnGhost"
+					   th:href="@{|/reviews/${rv.id}/edit?lang=${lang}|}"
+					   th:text="#{review.edit}">수정</a>
+		           
+		
+		        <form th:action="@{|/reviews/${rv.id}/delete?lang=${lang}|}" method="post" style="display:inline;">
+		        <button class="btnRed" type="submit"
+				        th:attr="onclick=|return confirm('${#messages.msg('review.deleteConfirm')}')|"
+				        th:text="#{review.delete}">삭제</button>
+		        </form>
+		      </div>
+		    </article>
+		  </div>
+		</section>
+	</div>
+  </div>
+
+</main>
+	<script th:inline="javascript">
+  // ─────────────────────────────────────────
+  // 공통: locale/lang + i18n 메시지
+  // ─────────────────────────────────────────
+  const isAnon = /*[[${#authorization.expression('isAnonymous()')}]]*/ false;
+  const malId  = /*[[${anime.malId}]]*/ 0;
+  const pageLang = /*[[${lang}]]*/ "ja"; // 현재 페이지 언어
+
+  // i18n 텍스트 (Thymeleaf 메시지)
+  const TXT = {
+    favOn:   /*[[#{detail.favorite}]]*/ "お気に入り",
+    favOff:  /*[[#{detail.favoriteOff}]]*/ "お気に入り解除",
+    toLogin: /*[[#{review.writeLogin}]]*/ "ログインしてレビューを書く", // 임시(로그인 유도)
+    favFail: /*[[#{common.error}]]*/ "処理に失敗しました。",           // 키 없으면 기본문구
+    netErr:  /*[[#{chat.networkError}]]*/ "ネットワークエラーです。更新してから再試行してください。",
+    srvErr:  /*[[#{chat.serverError}]]*/ "サーバーエラーです。少し後で再試行してください。",
+    send:    /*[[#{chat.send}]]*/ "送信",
+    sending: "...",
+    typing:  "生成中...",
+    cleared: /*[[#{chat.cleared}]]*/ "会話を消しました。もう一度質問してください！",
+    welcome: /*[[#{chat.welcome}]]*/ "気になることを聞いてください！（雰囲気/あらすじ/似た作品など）",
+    favLogin: "ログインが必要です。" // 필요한 경우 messages에 키 추가 추천
+  };
+
+  // ─────────────────────────────────────────
+  // 즐겨찾기 토글
+  // ─────────────────────────────────────────
+  const favBtn = document.getElementById('favBtn');
+  if (favBtn) {
+    favBtn.addEventListener('click', async () => {
+      if (isAnon) {
+        window.location.href = '/login';
+        return;
+      }
+
+      const malId = favBtn.dataset.malId;
+
+      try {
+        // ✅ lang을 같이 보내서 서버가 세션 locale을 ko로 못 박게 방지
+        const res = await fetch(`/api/mylist/favorite/toggle?malId=${encodeURIComponent(malId)}&lang=${encodeURIComponent(pageLang)}`, {
+          method: 'POST'
+        });
+
+        if (!res.ok) {
+          alert(TXT.favFail);
+          return;
+        }
+
+        const data = await res.json();
+        favBtn.textContent = data.favorite ? TXT.favOff : TXT.favOn;
+
+      } catch (e) {
+        alert(TXT.netErr);
+      }
+    });
+  }
+
+  // ─────────────────────────────────────────
+  // 챗봇
+  // ─────────────────────────────────────────
+  const chatBox   = document.getElementById("chatBox");
+  const chatInput = document.getElementById("chatInput");
+  const chatSend  = document.getElementById("chatSend");
+  const chatLang  = document.getElementById("chatLang");
+  const chatClear = document.getElementById("chatClear");
+
+  init();
+
+  function init() {
+    addMessage("bot", TXT.welcome);
+    chatSend.addEventListener("click", send);
+    chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+    chatClear.addEventListener("click", clearChat);
+  }
+
+  function clearChat() {
+    chatBox.innerHTML = "";
+    addMessage("bot", TXT.cleared);
+    chatInput.focus();
+  }
+
+  function nowTime() {
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `${hh}:${mm}`;
+  }
+
+  function addMessage(who, text, options = {}) {
+    const row = document.createElement("div");
+    row.className = `chat-row ${who}`;
+
+    const wrap = document.createElement("div");
+    wrap.className = "chat-wrap";
+
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble";
+
+    if (options.isHtml) bubble.innerHTML = text;
+    else bubble.innerText = text;
+
+    const meta = document.createElement("div");
+    meta.className = "chat-meta";
+    meta.innerText = options.meta ?? nowTime();
+
+    wrap.appendChild(bubble);
+    wrap.appendChild(meta);
+    row.appendChild(wrap);
+
+    chatBox.appendChild(row);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    return { row, bubble, meta };
+  }
+
+  function setSending(sending) {
+    chatSend.disabled = sending;
+    chatInput.disabled = sending;
+    chatSend.classList.toggle("isSending", sending);
+    chatSend.innerText = sending ? TXT.sending : TXT.send;
+  }
+
+  function addTyping() {
+    const html = `<div class="typing"><span></span><span></span><span></span></div>`;
+    return addMessage("bot", html, { isHtml: true, meta: TXT.typing });
+  }
+
+  function typeWriter(el, text, speed = 18) {
+    el.innerHTML = "";
+    const node = document.createTextNode("");
+    el.appendChild(node);
+
+    let i = 0;
+    return new Promise(resolve => {
+      function tick() {
+        if (i < text.length) {
+          node.nodeValue += text.charAt(i++);
+          chatBox.scrollTop = chatBox.scrollHeight;
+          setTimeout(tick, speed);
+        } else {
+          resolve();
+        }
+      }
+      tick();
+    });
+  }
+
+  function addRecommendations(recs) {
+    if (!recs || recs.length === 0) return;
+
+    const wrap = document.createElement("div");
+    wrap.className = "reco-wrap";
+
+    recs.slice(0, 6).forEach(name => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "reco-chip";
+      btn.innerText = "✨ " + name;
+
+      btn.addEventListener("click", () => {
+        const q = encodeURIComponent(name);
+        // ✅ SearchController는 q 파라미터 사용 + lang 유지
+        window.location.href = `/search?q=${q}&lang=${encodeURIComponent(chatLang.value || pageLang)}`;
+      });
+
+      wrap.appendChild(btn);
+    });
+
+    const row = document.createElement("div");
+    row.className = "chat-row bot";
+
+    const container = document.createElement("div");
+    container.className = "chat-wrap";
+    container.appendChild(wrap);
+
+    row.appendChild(container);
+    chatBox.appendChild(row);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  async function send() {
+    const q = (chatInput.value || "").trim();
+    if (!q) return;
+
+    addMessage("user", q);
+    chatInput.value = "";
+    setSending(true);
+
+    const typing = addTyping();
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          malId: malId,
+          lang: (chatLang.value || pageLang),
+          question: q
+        })
+      });
+
+      if (!res.ok) {
+        typing.row.remove();
+        addMessage("bot", TXT.srvErr);
+        return;
+      }
+
+      const data = await res.json();
+      typing.row.remove();
+
+      const msg = addMessage("bot", "");
+      await typeWriter(msg.bubble, data.answer || "(응답 없음)", 18);
+
+      if (data.recommendations && data.recommendations.length) {
+        addRecommendations(data.recommendations);
+      }
+
+    } catch (e) {
+      typing.row.remove();
+      addMessage("bot", TXT.netErr);
+    } finally {
+      setSending(false);
+      chatInput.focus();
+    }
+  }
+</script>
+
+		
+	</body>
+</html>
+		

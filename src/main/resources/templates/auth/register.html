@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="#{register.title}">회원가입</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+  <link rel="stylesheet" th:href="@{/css/register.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: siteHeader}"></div>
+
+<main class="container" style="max-width: 900px; padding: 24px 0;">
+  <div class="auth-wrap">
+    <div class="box">
+
+      <h1 class="auth-title">
+        <span>📝</span>
+        <span th:text="#{register.title}">회원가입</span>
+      </h1>
+
+      <p class="auth-sub" th:text="#{register.subtitle}">
+        간단한 정보만 입력하면 바로 시작할 수 있어요.
+      </p>
+
+      <!-- 서버 에러 메시지 -->
+      <div th:if="${errorMsg}" class="auth-msg error" th:text="#{${errorMsg}}"></div>
+
+      <form id="registerForm" th:action="@{/register}" method="post" th:object="${form}" novalidate>
+
+        <!-- username -->
+        <div class="auth-field">
+          <label class="auth-label">
+            <span th:text="#{register.username}">아이디</span>
+            <span class="req" th:text="#{common.required}">*</span>
+          </label>
+          <input class="auth-input" type="text" id="username" th:field="*{username}"
+                 th:attr="placeholder=#{register.username.placeholder}"
+                 autocomplete="username"
+                 required>
+          <div class="hint" id="usernameHint" th:text="#{register.username.hint}">
+            영문/숫자 조합을 권장합니다.
+          </div>
+        </div>
+
+        <!-- password -->
+        <div class="auth-field">
+          <label class="auth-label">
+            <span th:text="#{register.password}">비밀번호</span>
+            <span class="req" th:text="#{common.required}">*</span>
+          </label>
+          <input class="auth-input" type="password" id="password" th:field="*{password}"
+                 th:attr="placeholder=#{register.password.placeholder}"
+                 autocomplete="new-password"
+                 required>
+
+          <div style="margin-top:10px;">
+            <div class="pw-meter" aria-hidden="true"><div id="pwMeterBar"></div></div>
+          </div>
+
+          <div class="hint" id="passwordHint" th:text="#{register.password.info}">
+            8자 이상을 권장합니다.
+          </div>
+        </div>
+
+        <!-- password confirm -->
+        <div class="auth-field">
+          <label class="auth-label">
+            <span th:text="#{register.password.confirm}">비밀번호 확인</span>
+            <span class="req" th:text="#{common.required}">*</span>
+          </label>
+          <input class="auth-input" type="password" id="passwordConfirm"
+                 th:attr="placeholder=#{register.password.confirm.placeholder}"
+                 autocomplete="new-password"
+                 required>
+          <div class="hint" id="passwordConfirmHint"></div>
+        </div>
+
+        <!-- nickname -->
+        <div class="auth-field">
+          <label class="auth-label" th:text="#{register.nickname}">닉네임</label>
+          <input class="auth-input" type="text" id="nickname" th:field="*{nickname}"
+                 th:attr="placeholder=#{register.nickname.placeholder}"
+                 autocomplete="nickname">
+          <div class="hint" id="nicknameHint"></div>
+        </div>
+
+        <!-- email -->
+        <div class="auth-field">
+          <label class="auth-label" th:text="#{register.email}">이메일</label>
+          <input class="auth-input" type="email" id="email" th:field="*{email}"
+                 th:attr="placeholder=#{register.email.placeholder}"
+                 autocomplete="email">
+          <div class="hint" id="emailHint"></div>
+        </div>
+
+        <div class="auth-actions">
+          <button class="auth-btn" id="submitBtn" type="submit" th:text="#{register.button}" disabled>
+            가입하기
+          </button>
+        </div>
+      </form>
+
+      <div class="auth-links">
+        <span th:text="#{register.login.link}">이미 계정이 있으신가요?</span>
+        <a th:href="@{/login}" th:text="#{register.login.link.text}">로그인</a>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- ✅ JS: 회원가입 UX 필수 세트 -->
+<script th:inline="javascript">
+  (function () {
+    const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const username = document.getElementById('username');
+    const password = document.getElementById('password');
+    const passwordConfirm = document.getElementById('passwordConfirm');
+    const nickname = document.getElementById('nickname');
+    const email = document.getElementById('email');
+
+    const usernameHint = document.getElementById('usernameHint');
+    const passwordHint = document.getElementById('passwordHint');
+    const passwordConfirmHint = document.getElementById('passwordConfirmHint');
+    const nicknameHint = document.getElementById('nicknameHint');
+    const emailHint = document.getElementById('emailHint');
+
+    const pwMeterBar = document.getElementById('pwMeterBar');
+
+    // ✅ i18n 메시지 주입
+    const T = {
+      usernameBad: /*[[#{js.register.usernameBad}]]*/ '아이디 형식이 올바르지 않습니다.',
+      usernameOk:  /*[[#{js.register.usernameOk}]]*/  '사용 가능한 형식입니다.',
+      passwordWeak:/*[[#{js.register.passwordWeak}]]*/'비밀번호가 약합니다. 8자 이상 + 영문/숫자 조합을 권장합니다.',
+      passwordMin: /*[[#{js.register.passwordMin}]]*/ '비밀번호는 최소 4자리 이상이어야 합니다.',
+      pwNotMatch:  /*[[#{js.register.pwNotMatch}]]*/  '비밀번호가 일치하지 않습니다.',
+      pwMatch:     /*[[#{js.register.pwMatch}]]*/     '비밀번호가 일치합니다.',
+      emailBad:    /*[[#{js.register.emailBad}]]*/    '이메일 형식이 올바르지 않습니다.',
+      emailOk:     /*[[#{js.register.emailOk}]]*/     '올바른 이메일 형식입니다.',
+      nicknameBad: /*[[#{js.register.nicknameBad}]]*/ '닉네임은 2~20자를 권장합니다.',
+      requiredFix: /*[[#{js.register.requiredFix}]]*/ '필수 항목을 확인해주세요.'
+    };
+
+    const usernameRe = /^[a-zA-Z0-9_]{4,20}$/;
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    function setHint(el, msg, type) {
+      el.textContent = msg || '';
+      el.classList.remove('ok', 'bad');
+      if (type) el.classList.add(type);
+    }
+
+    function validateUsername() {
+      const v = username.value.trim();
+      if (!v) { setHint(usernameHint, '', null); return false; }
+      if (!usernameRe.test(v)) { setHint(usernameHint, T.usernameBad, 'bad'); return false; }
+      setHint(usernameHint, T.usernameOk, 'ok');
+      return true;
+    }
+
+    function validatePassword() {
+      const v = password.value;
+
+      if (!v) {
+        setHint(passwordHint, '', null);
+        return false;
+      }
+
+      if (v.length < 4) {
+        setHint(passwordHint, T.passwordMin, 'bad');
+        return false;
+      }
+
+      // (원하면 강도 체크 문구도 여기서)
+      setHint(passwordHint, '', null);
+      return true;
+    }
+
+    function validatePasswordConfirm() {
+      const v1 = password.value;
+      const v2 = passwordConfirm.value;
+
+      if (!v2) { setHint(passwordConfirmHint, '', null); return false; }
+      if (v1 !== v2) { setHint(passwordConfirmHint, T.pwNotMatch, 'bad'); return false; }
+      setHint(passwordConfirmHint, T.pwMatch, 'ok');
+      return true;
+    }
+
+    function validateNickname() {
+      const v = (nickname.value || '').trim();
+      if (!v) { setHint(nicknameHint, '', null); return true; }
+      if (v.length < 2 || v.length > 20) { setHint(nicknameHint, T.nicknameBad, 'bad'); return true; }
+      setHint(nicknameHint, '', null);
+      return true;
+    }
+
+    function validateEmail() {
+      const v = (email.value || '').trim();
+      if (!v) { setHint(emailHint, '', null); return true; }
+      if (!emailRe.test(v)) { setHint(emailHint, T.emailBad, 'bad'); return false; }
+      setHint(emailHint, T.emailOk, 'ok');
+      return true;
+    }
+
+    function refreshSubmitState() {
+      const must1 = validateUsername();
+      const must2 = validatePassword();
+      const must3 = validatePasswordConfirm();
+      const opt2 = validateEmail();
+
+      const ok = must1 && must2 && must3 && opt2;
+      submitBtn.disabled = !ok;
+      return ok;
+    }
+
+    username.addEventListener('input', refreshSubmitState);
+    password.addEventListener('input', () => {
+      refreshSubmitState();
+      validatePasswordConfirm();
+    });
+    passwordConfirm.addEventListener('input', refreshSubmitState);
+    nickname.addEventListener('input', refreshSubmitState);
+    email.addEventListener('input', refreshSubmitState);
+
+    form.addEventListener('submit', function (e) {
+      const ok = refreshSubmitState();
+      if (!ok) {
+        e.preventDefault();
+        alert(T.requiredFix);
+      }
+    });
+
+    refreshSubmitState();
+  })();
+</script>
+
+</body>
+</html>
+

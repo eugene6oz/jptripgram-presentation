@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anime.mapper.MyAnimeListMapper">
+
+  <!--
+    ✅ is_favorite 컬럼을 더 이상 사용하지 않음.
+       row 존재 여부 = 즐겨찾기 ON, row 없음 = OFF 로 단순화.
+
+    DB 마이그레이션:
+      ALTER TABLE my_anime_list DROP COLUMN is_favorite;
+      DELETE FROM my_anime_list WHERE is_favorite = 0;  ← 먼저 정리 후 컬럼 삭제
+  -->
+
+  <!-- 즐겨찾기 여부: row 존재만 확인 -->
+  <select id="isFavorite" resultType="int">
+    SELECT COUNT(*)
+    FROM my_anime_list
+    WHERE user_id    = #{userId}
+      AND mal_anime_id = #{malId}
+  </select>
+
+  <!-- 즐겨찾기 malId 목록 -->
+  <select id="findFavoriteIds" resultType="int">
+    SELECT mal_anime_id
+    FROM my_anime_list
+    WHERE user_id = #{userId}
+    ORDER BY updated_at DESC
+    LIMIT #{limit}
+  </select>
+
+  <!-- 즐겨찾기 ON: 없으면 INSERT, 있으면 updated_at 갱신 -->
+  <insert id="favoriteOn">
+    INSERT INTO my_anime_list (user_id, mal_anime_id)
+    VALUES (#{userId}, #{malId})
+    ON DUPLICATE KEY UPDATE
+      updated_at = CURRENT_TIMESTAMP(3)
+  </insert>
+
+  <!-- ✅ 즐겨찾기 OFF: UPDATE 대신 DELETE → 쓰레기 row 없음 -->
+  <delete id="favoriteOff">
+    DELETE FROM my_anime_list
+    WHERE user_id    = #{userId}
+      AND mal_anime_id = #{malId}
+  </delete>
+
+</mapper>

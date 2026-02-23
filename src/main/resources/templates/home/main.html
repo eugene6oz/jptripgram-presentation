@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anime Platform | Home</title>
+<link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+	<div th:replace="~{fragments/header :: siteHeader}"></div>
+
+	<main class="container">
+
+		<!-- HERO -->
+		<section class="hero">
+			<h1 th:text="#{home.hero.title}">오늘 뭐 볼까요?</h1>
+			<p th:text="#{home.hero.desc}">검색하고, 저장하고, 평점과 리뷰로 취향을 기록하세요.</p>
+
+			<form class="search" th:action="@{/search}" method="get">
+				<!-- ✅ 현재 언어 유지 -->
+				<input type="hidden" name="lang" th:value="${lang}"> <input
+					type="text" name="q"
+					th:attr="placeholder=#{home.search.placeholder}"
+					placeholder="애니 제목 검색 (예: 원피스, 나루토)">
+
+				<button type="submit" th:text="#{home.search.button}">검색</button>
+			</form>
+		</section>
+
+		<!-- 이번 시즌 신작 (Pick 6) -->
+		<section class="section">
+			<div class="section-title">
+				<h2 th:text="#{home.season.title}">이번 시즌 신작</h2>
+				<span th:text="#{home.season.pick}">Pick 6</span>
+			</div>
+
+			<div class="grid">
+				<a class="card card-link" th:each="a : ${seasonPicks}"
+					th:href="@{|/anime/${a.malId}?lang=${lang}|}"> <img
+					class="poster-img" th:src="${a.images.jpg.largeImageUrl}"
+					alt="POSTER">
+
+					<div class="card-body">
+						<p class="title" th:text="${a.title}">제목</p>
+						<div class="meta">
+							<span th:text="${a.score == null ? '⭐ -' : '⭐ ' + a.score}">⭐
+								-</span> <span>·</span> <span
+								th:text="${a.status == null ? 'STATUS ?' : a.status}">STATUS</span>
+						</div>
+					</div>
+
+				</a>
+			</div>
+		</section>
+
+		<!-- 인기 애니 (TOP 6) -->
+		<section class="section">
+			<div class="section-title">
+				<h2 th:text="#{home.popular.title}">인기 애니</h2>
+				<span th:text="#{home.popular.top}">TOP 6</span>
+			</div>
+
+			<div class="grid">
+				<a class="card card-link" th:each="a : ${popularAnime}"
+					th:href="@{|/anime/${a.malId}?lang=${lang}|}"> <img
+					class="poster-img" th:src="${a.images.jpg.largeImageUrl}"
+					alt="POSTER">
+
+					<div class="card-body">
+						<p class="title" th:text="${a.title}">인기 애니 제목</p>
+						<!-- ✅ 내가 즐겨찾기한 애니면 ★ 표시 -->
+						<span class="badge-fav"
+							th:if="${favoriteIds != null and favoriteIds.contains(a.malId)}">★</span>
+						<div class="meta">
+							<span th:text="${a.score == null ? '⭐ -' : '⭐ ' + a.score}">⭐
+								-</span>
+						</div>
+					</div>
+
+				</a>
+			</div>
+		</section>
+
+		<!-- 최근 리뷰 -->
+		<section class="section">
+			<div class="section-title">
+				<h2 th:text="#{home.recent.title}">최근 리뷰</h2>
+			</div>
+
+			<p th:if="${#lists.isEmpty(recentReviews)}"
+			   class="muted"
+			   th:text="#{home.review.empty}">
+			    아직 리뷰가 없습니다.
+			</p>
+
+			<div class="list" th:if="${!#lists.isEmpty(recentReviews)}">
+				<div class="item" th:each="rv : ${recentReviews}">
+					<div>
+						<b th:text="${rv.title}">리뷰 제목</b><br> <span> <span
+							th:text="${rv.nickname != null ? rv.nickname : rv.username}">작성자</span>
+							<span class="sep">·</span> <span
+							th:text="${'MAL ' + rv.malAnimeId}">MAL</span> <span class="sep">·</span>
+							<span
+							th:text="${#temporals.format(rv.createdAt,'yyyy-MM-dd HH:mm')}">date</span>
+						</span>
+					</div>
+
+					<a class="btn-ghost" th:href="@{|/reviews/${rv.id}?lang=${lang}|}"
+						th:text="#{home.recent.view}"> 보기 </a>
+				</div>
+			</div>
+		</section>
+
+
+	</main>
+
+</body>
+</html>
+
+

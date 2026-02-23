@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="#{admin.title}">관리자 대시보드</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+  <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: siteHeader}"></div>
+
+<div class="admin-wrap">
+  <h1 th:text="#{admin.title}">🛠 관리자 대시보드</h1>
+
+  <!-- 요약 통계 -->
+  <div class="stat-row">
+    <div class="stat">
+      <div class="num" th:text="${users.size()}">0</div>
+      <div class="lbl" th:text="#{admin.stat.users}">전체 회원</div>
+    </div>
+    <div class="stat">
+      <div class="num" th:text="${reviews.size()}">0</div>
+      <div class="lbl" th:text="#{admin.stat.reviews}">전체 리뷰</div>
+    </div>
+    <div class="stat">
+      <div class="num" th:text="${reportedCount}">0</div>
+      <div class="lbl" th:text="#{admin.stat.reported}">신고 접수된 리뷰</div>
+    </div>
+  </div>
+
+  <!-- 탭 -->
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('reviews', this)" th:text="#{admin.tab.reviews}">리뷰 관리</div>
+    <div class="tab"        onclick="switchTab('users', this)"   th:text="#{admin.tab.users}">회원 관리</div>
+  </div>
+
+  <!-- 리뷰 탭 -->
+  <div id="tab-reviews" class="tab-content active">
+    <div class="section">
+      <h2 th:text="#{admin.review.list.title}">리뷰 목록 (신고 많은 순)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th th:text="#{admin.col.id}">ID</th>
+            <th th:text="#{admin.col.author}">작성자</th>
+            <th th:text="#{admin.col.title}">제목</th>
+            <th th:text="#{admin.col.animeId}">애니 ID</th>
+            <th th:text="#{admin.col.report}">신고</th>
+            <th th:text="#{admin.col.date}">작성일</th>
+            <th th:text="#{admin.col.action}">작업</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="r : ${reviews}">
+            <td th:text="${r.id}"></td>
+            <td th:text="${r.nickname != null ? r.nickname : r.username}"></td>
+            <td>
+              <a class="truncate" style="color:#fff; text-decoration:none;"
+                 th:href="@{|/reviews/${r.id}?lang=ko|}"
+                 th:text="${r.title}"></a>
+            </td>
+            <td>
+              <a th:href="@{'/anime/' + ${r.malAnimeId}}" th:text="${r.malAnimeId}"
+                 style="color:var(--muted); text-decoration:none;"></a>
+            </td>
+            <td>
+              <span class="badge-report"
+                    th:classappend="${r.reportCount == 0 or r.reportCount == null} ? ' zero' : ''"
+                    th:text="${(r.reportCount != null ? r.reportCount : 0) + ' ' + #messages.msg('admin.report.unit')}"></span>
+            </td>
+            <td th:text="${#temporals.format(r.createdAt, 'yy.MM.dd')}"></td>
+            <td style="display:flex; gap:6px; flex-wrap:wrap;">
+              <form th:action="@{'/admin/reviews/' + ${r.id} + '/report-reset'}" method="post"
+                    th:if="${r.reportCount != null and r.reportCount > 0}">
+                <button class="btn-sm btn-reset" th:text="#{admin.report.reset}">신고 초기화</button>
+              </form>
+              <form th:action="@{'/admin/reviews/' + ${r.id} + '/delete'}" method="post"
+                    th:attr="onsubmit=|return confirm('#{admin.review.delete.confirm}')|">
+                <button class="btn-sm btn-del" th:text="#{admin.review.delete}">삭제</button>
+              </form>
+            </td>
+          </tr>
+          <tr th:if="${reviews.empty}">
+            <td colspan="7" style="text-align:center; color:var(--muted); padding:32px;"
+                th:text="#{admin.review.empty}">리뷰가 없습니다.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 회원 탭 -->
+  <div id="tab-users" class="tab-content">
+    <div class="section">
+      <h2 th:text="#{admin.user.list.title}">회원 목록</h2>
+      <table>
+        <thead>
+          <tr>
+            <th th:text="#{admin.col.id}">ID</th>
+            <th th:text="#{admin.col.username}">아이디</th>
+            <th th:text="#{admin.col.nickname}">닉네임</th>
+            <th th:text="#{admin.col.email}">이메일</th>
+            <th th:text="#{admin.col.role}">권한</th>
+            <th th:text="#{admin.col.joinDate}">가입일</th>
+            <th th:text="#{admin.col.lastLogin}">마지막 로그인</th>
+            <th th:text="#{admin.col.action}">작업</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="u : ${users}">
+            <td th:text="${u.id}"></td>
+            <td th:text="${u.username}"></td>
+            <td th:text="${u.nickname}"></td>
+            <td th:text="${u.email}"></td>
+            <td>
+              <span th:text="${u.role}"
+                    th:style="${u.role == 'ROLE_ADMIN'} ? 'color:#fbd38d' : 'color:var(--muted)'"></span>
+            </td>
+            <td th:text="${#temporals.format(u.createdAt, 'yy.MM.dd')}"></td>
+            <td th:text="${u.lastLoginAt != null ? #temporals.format(u.lastLoginAt, 'yy.MM.dd HH:mm') : '-'}"></td>
+            <td>
+              <form th:action="@{'/admin/users/' + ${u.id} + '/delete'}" method="post"
+                    th:attr="onsubmit=|return confirm('#{admin.user.force.withdraw.confirm}')|">
+                <button class="btn-sm btn-del"
+                        th:disabled="${u.role == 'ROLE_ADMIN'}"
+                        th:text="#{admin.user.force.withdraw}">강제 탈퇴</button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(name, el) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>

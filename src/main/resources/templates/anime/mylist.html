@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="#{mylist.title}">내 리스트</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: siteHeader}"></div>
+
+<main class="container">
+
+  <!-- 즐겨찾기 캐러셀 -->
+  <section class="section">
+    <div class="section-title">
+      <h2 th:text="#{mylist.fav.title}">즐겨찾기</h2>
+      <span th:text="#{mylist.fav.count(${#lists.size(favoriteCards)})}">0개 표시중</span>
+    </div>
+
+    <p th:if="${#lists.isEmpty(favoriteCards)}" class="muted" th:text="#{mylist.fav.empty}">
+      아직 즐겨찾기가 없습니다.
+    </p>
+
+    <div class="fav-carousel" th:if="${!#lists.isEmpty(favoriteCards)}">
+      <button class="car-btn" type="button" onclick="scrollFav(-1)">‹</button>
+      <div class="car-track" id="favTrack">
+        <a class="fav-card"
+           th:each="a : ${favoriteCards}"
+           th:href="@{|/anime/${a.malId}?lang=${lang}|}">
+          <img class="fav-img" th:src="${a.images.jpg.largeImageUrl}" alt="poster">
+          <div class="fav-title" th:text="${a.title}">title</div>
+          <div class="fav-meta" th:text="${a.score == null ? '⭐ -' : '⭐ ' + a.score}">⭐</div>
+        </a>
+      </div>
+      <button class="car-btn" type="button" onclick="scrollFav(1)">›</button>
+    </div>
+  </section>
+
+  <!-- 내가 쓴 리뷰 -->
+  <section class="section">
+    <div class="section-title">
+      <h2 th:text="#{mylist.review.title}">내가 쓴 리뷰</h2>
+      <span th:text="#{mylist.review.count(${#lists.size(myReviews)})}">0개</span>
+    </div>
+
+    <p th:if="${#lists.isEmpty(myReviews)}" class="muted" th:text="#{mylist.review.empty}">
+      아직 작성한 리뷰가 없습니다.
+    </p>
+
+    <div class="list-grid" th:if="${!#lists.isEmpty(myReviews)}">
+      <div class="list-card" th:each="rv : ${myReviews}">
+        <div class="list-body" style="width:100%;">
+
+          <div class="list-title">
+            <a th:href="@{|/reviews/${rv.id}?lang=${lang}|}" th:text="${rv.title}">title</a>
+          </div>
+
+          <div class="list-meta">
+            <span class="muted" th:text="${#temporals.format(rv.createdAt,'yyyy-MM-dd HH:mm')}">date</span>
+          </div>
+
+          <div class="list-actions">
+            <a class="btnGhost"
+               th:href="@{|/anime/${rv.malAnimeId}?lang=${lang}|}"
+               th:text="#{mylist.review.anime}">해당 애니</a>
+
+            <a class="btnGhost"
+               th:href="@{|/reviews/${rv.id}/edit?lang=${lang}|}"
+               th:text="#{mylist.review.edit}">수정</a>
+
+            <form th:action="@{|/reviews/${rv.id}/delete?lang=${lang}|}" method="post" style="display:inline;">
+              <button class="btnRed" type="submit"
+                      th:attr="onclick=|return confirm('#{mylist.review.deleteConfirm}')|"
+                      th:text="#{mylist.review.delete}">삭제</button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  function scrollFav(dir) {
+    const track = document.getElementById('favTrack');
+    if (!track) return;
+    const amount = Math.floor(track.clientWidth * 0.85) * dir;
+    track.scrollBy({ left: amount, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>

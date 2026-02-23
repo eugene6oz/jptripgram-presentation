@@ -1,0 +1,420 @@
+/* detail.css - anime/detail.html 전용 */
+
+/* -----------------------
+   레이아웃
+----------------------- */
+.detail-wrap {
+  padding-top: 18px;
+  padding-bottom: 40px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+/* 반응형 */
+@media (max-width: 980px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .posterBox {
+    max-width: 320px;
+  }
+}
+
+/* -----------------------
+   포스터
+----------------------- */
+.posterBox {
+  position: sticky;
+  top: 86px; /* header 높이에 맞게 필요하면 조정 */
+  align-self: start;
+}
+
+.posterBox img {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  display: block;
+}
+
+/* -----------------------
+   우측 본문 박스
+----------------------- */
+.box {
+  background: rgba(20, 20, 24, .55);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.30);
+}
+
+/* 타이틀 */
+.titleLine {
+  margin-bottom: 12px;
+}
+
+.jpTitle {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.enTitle {
+  margin: 8px 0 0;
+  color: rgba(255,255,255,.65);
+  font-size: 13px;
+}
+
+/* -----------------------
+   칩(메타 정보)
+----------------------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 10px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  font-size: 12px;
+  color: rgba(255,255,255,.88);
+}
+
+/* -----------------------
+   액션 버튼
+----------------------- */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0 18px;
+}
+
+/* main.css 버튼을 쓰되, 여기서 패딩만 통일 */
+.actions .btnRed,
+.actions .btnGhost {
+  padding: 10px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+}
+
+/* -----------------------
+   줄거리
+----------------------- */
+.synopsis {
+  margin-top: 8px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  color: rgba(255,255,255,.88);
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+/* -----------------------
+   챗봇 섹션
+----------------------- */
+.chatbot-section {
+  margin-top: 18px;
+}
+
+.chatbot-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.chatbot-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+}
+
+.chatbot-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chatbot-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  font-size: 12px;
+  opacity: .9;
+}
+
+.chatbot-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chatbot-select,
+.chatbot-clear {
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.9);
+  padding: 8px 10px;
+  border-radius: 12px;
+  outline: none;
+}
+
+.chatbot-clear {
+  cursor: pointer;
+}
+
+.chatbot-clear:hover {
+  background: rgba(255,255,255,.10);
+}
+
+.chatbot-body {
+  padding: 12px;
+}
+
+.chatbot-box {
+  height: 260px;
+  overflow: auto;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.18);
+}
+
+/* 채팅 말풍선(너 JS 클래스 기준) */
+.chat-row {
+  display: flex;
+  margin: 8px 0;
+}
+
+.chat-row.user { justify-content: flex-end; }
+.chat-row.bot { justify-content: flex-start; }
+
+.chat-wrap { max-width: 82%; }
+
+.chat-bubble {
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.chat-row.user .chat-bubble {
+  background: rgba(255, 90, 120, .16);
+  border-color: rgba(255, 90, 120, .28);
+}
+
+.chat-meta {
+  margin-top: 4px;
+  font-size: 11px;
+  opacity: .65;
+}
+
+.chatbot-foot {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.chatbot-input {
+  flex: 1;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.15);
+  background: #ffffff;
+  color: #111;                  /* 🔥 검정 계열 */
+  padding: 10px 12px;
+  outline: none;
+}
+
+.chatbot-input::placeholder {
+  color: #888;
+}
+
+.chatbot-input:focus {
+  border-color: rgba(255, 90, 120, .65);
+  box-shadow: 0 0 0 4px rgba(255, 90, 120, .12);
+}
+
+
+.chatbot-send {
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(20,20,20,.85);
+  color: rgba(255,255,255,.92);
+  transition: all .2s ease;
+}
+
+.chatbot-send:hover {
+  background: rgba(35,35,35,.95);
+}
+
+/* 타이핑 애니메이션(너 JS에 typing 클래스 있음) */
+.typing { display:flex; gap:6px; padding: 6px 2px; }
+.typing span {
+  width: 6px; height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.55);
+  display: inline-block;
+  animation: typingDot 1s infinite ease-in-out;
+}
+.typing span:nth-child(2){ animation-delay: .15s; }
+.typing span:nth-child(3){ animation-delay: .30s; }
+
+@keyframes typingDot {
+  0%, 80%, 100% { transform: translateY(0); opacity: .45; }
+  40% { transform: translateY(-4px); opacity: .95; }
+}
+
+/* 추천칩 */
+.reco-wrap {
+  display:flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.reco-chip {
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.9);
+  padding: 8px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.reco-chip:hover { background: rgba(255,255,255,.10); }
+
+/* -----------------------
+   리뷰 섹션(목록)
+----------------------- */
+.section {
+  margin-top: 28px;
+}
+
+.section-title {
+  display:flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.section-title h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.muted {
+  opacity: .7;
+  margin: 12px 0 0;
+}
+
+/* 리뷰 리스트 */
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.review-item {
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+.review-head {
+  display:flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.review-title {
+  display: inline-block;
+  font-weight: 900;
+  font-size: 18px;
+  text-decoration: none;
+  color: #fff;
+}
+.review-title:hover { text-decoration: underline; }
+
+.review-meta {
+  margin-top: 8px;
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  opacity: .85;
+}
+.review-meta .sep { opacity: .6; }
+
+/* 평점 표시(목록용) */
+.review-score {
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.review-score-num {
+  font-weight: 900;
+  opacity: .9;
+}
+.review-stars {
+  display:inline-flex;
+  gap: 3px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* ⚠️ 전역 .star 건드리지 않기: review-stars 안에서만 */
+.review-stars .star { color: rgba(255,255,255,.25); }
+.review-stars .star-full { color: gold; }
+.review-stars .star-half {
+  background: linear-gradient(90deg, gold 50%, rgba(255,255,255,.25) 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.review-stars .star-empty { color: rgba(255,255,255,.25); }
+
+.review-actions {
+  margin-top: 14px;
+  display:flex;
+  gap: 10px;
+  align-items:center;
+}
+.review-actions .btnGhost,
+.review-actions .btnRed {
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-decoration:none;
+}

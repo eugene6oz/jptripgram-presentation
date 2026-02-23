@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="#{profile.title}">내 정보</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+  <style>
+    .profile-wrap { max-width: 520px; margin: 60px auto; padding: 0 16px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+    .card h2 { margin: 0 0 24px; font-size: 18px; }
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    .field input { width: 100%; padding: 10px 14px; background: rgba(255,255,255,.07); border: 1px solid var(--line); border-radius: 8px; color: #fff; font-size: 14px; }
+    .field input:focus { outline: none; border-color: var(--red); }
+    .field .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .btn-primary { width: 100%; padding: 12px; background: var(--red); border: none; border-radius: 8px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .btn-primary:hover { background: var(--red2); }
+    .btn-danger { width: 100%; padding: 12px; background: transparent; border: 1px solid #e53e3e; border-radius: 8px; color: #e53e3e; font-size: 14px; cursor: pointer; }
+    .btn-danger:hover { background: rgba(229,62,62,.12); }
+    .alert-error { background: rgba(229,62,62,.15); border: 1px solid rgba(229,62,62,.4); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; color: #fc8181; font-size: 14px; }
+    .alert-success { background: rgba(72,187,120,.15); border: 1px solid rgba(72,187,120,.4); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; color: #9ae6b4; font-size: 14px; }
+    .divider { border: none; border-top: 1px solid var(--line); margin: 8px 0 20px; }
+    .username-badge { display: inline-block; padding: 4px 12px; background: rgba(255,255,255,.08); border-radius: 999px; font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+    .withdraw-toggle { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; text-decoration: underline; padding: 0; }
+    .withdraw-box { display: none; margin-top: 16px; }
+    .withdraw-box.open { display: block; }
+  </style>
+</head>
+<body>
+<div th:replace="~{fragments/header :: siteHeader}"></div>
+
+<div class="profile-wrap">
+
+  <div class="alert-success" th:if="${param.updated}"    th:text="#{profile.updated}"></div>
+  <div class="alert-error"   th:if="${param.withdrawError}" th:text="#{profile.withdraw.error}"></div>
+  <div class="alert-error"   th:if="${errorMsg}"         th:text="${errorMsg}"></div>
+
+  <!-- 회원정보 수정 -->
+  <div class="card">
+    <h2 th:text="#{profile.edit.title}">내 정보 수정</h2>
+    <div class="username-badge" th:text="'@' + ${user.username}"></div>
+
+    <form th:action="@{/user/profile}" method="post" th:object="${form}">
+      <div class="field">
+        <label th:text="#{profile.nickname}">닉네임</label>
+        <input type="text" th:field="*{nickname}" th:attr="placeholder=#{profile.nickname.placeholder}">
+      </div>
+      <div class="field">
+        <label th:text="#{profile.email}">이메일</label>
+        <input type="email" th:field="*{email}" th:attr="placeholder=#{profile.email.placeholder}">
+      </div>
+
+      <hr class="divider">
+      <div style="font-size:13px; color:var(--muted); margin-bottom:14px;"
+           th:text="#{profile.password.section}">비밀번호 변경</div>
+
+      <div class="field">
+        <label th:text="#{profile.password.current}">현재 비밀번호</label>
+        <input type="password" th:field="*{currentPassword}" th:attr="placeholder=#{profile.password.current.placeholder}">
+      </div>
+      <div class="field">
+        <label th:text="#{profile.password.new}">새 비밀번호</label>
+        <input type="password" th:field="*{newPassword}" th:attr="placeholder=#{profile.password.new.placeholder}">
+      </div>
+      <div class="field">
+        <label th:text="#{profile.password.confirm}">새 비밀번호 확인</label>
+        <input type="password" th:field="*{newPasswordConfirm}" th:attr="placeholder=#{profile.password.confirm.placeholder}">
+      </div>
+
+      <button type="submit" class="btn-primary" th:text="#{profile.save}">저장</button>
+    </form>
+  </div>
+
+  <!-- 회원 탈퇴 -->
+  <div class="card">
+    <h2 th:text="#{profile.withdraw.title}">회원 탈퇴</h2>
+    <p style="font-size:14px; color:var(--muted); margin:0 0 16px;"
+       th:text="#{profile.withdraw.desc}">탈퇴 시 모든 데이터가 영구 삭제됩니다.</p>
+    <button class="withdraw-toggle"
+            onclick="document.getElementById('withdrawBox').classList.toggle('open')"
+            th:text="#{profile.withdraw.toggle}">탈퇴하기 ▾</button>
+    <div id="withdrawBox" class="withdraw-box">
+      <form th:action="@{/user/withdraw}" method="post">
+        <div class="field" style="margin-top:12px;">
+          <label th:text="#{profile.withdraw.password}">비밀번호 확인</label>
+          <input type="password" name="password" th:attr="placeholder=#{profile.withdraw.password.placeholder}">
+          <div class="hint" th:text="#{profile.withdraw.password.hint}">본인 확인을 위해 비밀번호를 입력하세요.</div>
+        </div>
+        <button type="submit" class="btn-danger"
+                th:attr="onclick=|return confirm('#{profile.withdraw.confirm}')|"
+                th:text="#{profile.withdraw.button}">탈퇴 확인</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

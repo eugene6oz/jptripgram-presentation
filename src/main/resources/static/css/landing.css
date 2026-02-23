@@ -1,0 +1,129 @@
+/* =========================
+   기본 세팅
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Apple SD Gothic Neo", sans-serif;
+    background: #000;
+    color: #fff;
+}
+
+/* =========================
+   히어로 영역
+========================= */
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    background:
+        radial-gradient(circle at 70% 30%, rgba(229, 9, 20, 0.3), transparent 40%),
+        linear-gradient(to bottom, #000 10%, #111 80%);
+}
+
+/* =========================
+   네비바
+========================= */
+.navbar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* =========================
+   버튼 스타일
+========================= */
+.btn-primary {
+    background: #e50914;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background: #f6121d;
+}
+
+.btn-outline {
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* =========================
+   중앙 콘텐츠
+========================= */
+.center-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.center-content h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: #ccc;
+    margin-bottom: 30px;
+}
+
+/* =========================
+   검색박스
+========================= */
+.search-box {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-box input {
+    padding: 12px;
+    width: 280px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+}
+
+.search-box button {
+    padding: 12px 18px;
+    border-radius: 6px;
+    border: none;
+    background: #e50914;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.search-box button:hover {
+    background: #f6121d;
+}

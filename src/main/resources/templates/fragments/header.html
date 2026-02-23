@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<header class="header" th:fragment="siteHeader">
+  <div class="container header-inner">
+
+    <a class="brand" href="/home">🎌 Anime Platform</a>
+
+    <nav class="nav">
+      <a th:href="@{/search(q='')}" th:text="#{menu.search}">검색</a>
+      <a href="/mylist" th:text="#{menu.mylist}">내 리스트</a>
+      <a href="/admin" sec:authorize="hasRole('ADMIN')"
+         th:text="#{menu.admin}"
+         style="color:#fbd38d; border-color:rgba(251,211,141,.3);">⚙ 관리자</a>
+    </nav>
+
+    <div class="userbox">
+      <a class="btn-ghost lang-btn" href="#" data-lang="ko"
+	   th:classappend="${param.lang != null and param.lang[0] == 'ko'} ? ' active-lang' : ''"
+	   th:text="#{lang.ko}">KO</a>
+	  <a class="btn-ghost lang-btn" href="#" data-lang="ja"
+	   th:classappend="${param.lang != null and param.lang[0] == 'ja'} ? ' active-lang' : ''"
+	   th:text="#{lang.ja}">JA</a>
+  	  <a class="btn-ghost lang-btn" href="#" data-lang="en"
+	   th:classappend="${param.lang != null and param.lang[0] == 'en'} ? ' active-lang' : ''"
+	   th:text="#{lang.en}">EN</a>
+
+      <span sec:authorize="isAuthenticated()">
+        <a href="/user/profile" style="color:#fff; text-decoration:none; font-weight:600;"
+           th:text="${#authentication.principal.nickname != null
+                      ? #authentication.principal.nickname
+                      : #authentication.name}">user</a>
+      </span>
+
+      <a class="btn-ghost" sec:authorize="isAnonymous()"
+         href="/login" th:text="#{auth.login}">로그인</a>
+
+      <a class="btn-red" sec:authorize="isAuthenticated()"
+         href="/logout" th:text="#{auth.logout}">로그아웃</a>
+    </div>
+  </div>
+	<script>
+	document.addEventListener('click', (e) => {
+	  const a = e.target.closest('.lang-btn');
+	  if (!a) return;
+	
+	  e.preventDefault();
+	
+	  const lang = a.dataset.lang;
+	  const url = new URL(window.location.href);
+	  url.searchParams.set('lang', lang);   // ✅ lang만 교체
+	  window.location.href = url.toString(); // ✅ 나머지 파라미터 유지
+	});
+	</script>
+</header>
+
+</body>
+</html>
+

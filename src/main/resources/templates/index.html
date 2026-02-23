@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title th:text="#{landing.title}">Anime Platform</title>
+
+    <link rel="stylesheet" th:href="@{/css/landing.css}">
+</head>
+<body>
+
+<div class="hero">
+
+    <!-- 상단 -->
+    <div class="navbar">
+        <div class="logo">🎌 <span th:text="#{landing.logo}">Anime Platform</span></div>
+
+        <div class="nav-buttons">
+            <!-- 언어 변경 -->
+            <a th:href="@{/(lang='ko')}" class="btn-outline" th:text="#{lang.ko}">한국어</a>
+            <a th:href="@{/(lang='ja')}" class="btn-outline" th:text="#{lang.ja}">日本語</a>
+            <a th:href="@{/(lang='en')}" class="btn-outline" th:text="#{lang.en}">English</a>
+
+            <!-- 로그인/회원가입도 lang 유지 -->
+            <a th:href="@{/register(lang=${param.lang})}"
+               class="btn-outline"
+               th:text="#{nav.register}">
+            </a>
+
+            <a th:href="@{/login(lang=${param.lang})}"
+               class="btn-primary"
+               th:text="#{nav.login}">
+            </a>
+        </div>
+    </div>
+
+    <!-- 중앙 -->
+    <div class="center-content">
+        <h1 th:utext="#{landing.headline}">
+            애니를 더 쉽고,<br>더 세련되게.
+        </h1>
+
+        <p class="subtitle"
+           th:text="#{landing.subtitle}">
+        </p>
+
+        <form th:action="@{/search}"
+              method="get"
+              class="search-box">
+
+            <!-- lang 유지 -->
+            <input type="hidden"
+                   name="lang"
+                   th:value="${param.lang != null ? param.lang : 'ko'}" />
+
+            <input type="text"
+                   name="q"
+                   th:attr="placeholder=#{landing.search.placeholder}">
+
+            <button type="submit"
+                    th:text="#{landing.search.button}">
+                검색 시작
+            </button>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>
+

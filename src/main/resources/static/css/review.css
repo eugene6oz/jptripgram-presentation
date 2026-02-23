@@ -1,0 +1,158 @@
+/* review.css - 리뷰 작성/수정 페이지 전용 */
+
+/* 페이지 래퍼 */
+.review-page{
+  max-width: 900px;
+  margin: 28px auto;
+  padding: 0 16px;
+}
+
+/* 헤더 영역 */
+.review-hero{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin: 18px 0 14px;
+}
+.review-hero h1{
+  font-size:28px;
+  font-weight:800;
+  margin:0;
+}
+.review-hero .sub{
+  color: rgba(255,255,255,.65);
+  font-size:13px;
+  margin-top:6px;
+}
+
+/* 카드 */
+.review-card{
+  background: rgba(20, 20, 24, .72);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+.review-card-inner{ padding: 18px; }
+
+/* 상단 애니 미니 카드 */
+.anime-mini{
+  display:flex;
+  gap:14px;
+  padding: 16px 18px;
+  background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.anime-mini img{
+  width:72px;
+  height:100px;
+  object-fit:cover;
+  border-radius:10px;
+  border: 1px solid rgba(255,255,255,.10);
+}
+.anime-mini .title{
+  font-size:16px;
+  font-weight:800;
+  margin:0;
+}
+.anime-mini .meta{
+  margin-top:6px;
+  color: rgba(255,255,255,.65);
+  font-size:13px;
+}
+
+/* 폼 */
+.form-row{ margin: 14px 0; }
+.form-row label{
+  display:block;
+  font-size:13px;
+  color: rgba(255,255,255,.70);
+  margin-bottom: 8px;
+}
+
+/* main.css 전역 스타일과 충돌 줄이려고 review-page 스코프 걸기 */
+.review-page .form-row input,
+.review-page .form-row textarea{
+  width:100%;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 12px;
+  padding: 12px 12px;
+  color:#fff;
+  outline:none;
+}
+.review-page .form-row input:focus,
+.review-page .form-row textarea:focus{
+  border-color: rgba(255, 90, 120, .65);
+  box-shadow: 0 0 0 4px rgba(255, 90, 120, .12);
+}
+.review-page .form-row textarea{
+  min-height: 220px;
+  resize: vertical;
+}
+
+.form-help{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:8px;
+  font-size:12px;
+  color: rgba(255,255,255,.55);
+}
+
+/* 버튼 */
+.review-actions{
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+}
+.review-actions .btnRed,
+.review-actions .btnGhost{
+  padding:10px 16px;
+  border-radius: 12px;
+  text-decoration:none;
+}
+
+/* =========================
+   별점 입력 UI (JS로 만드는 #starRating .star)
+   ========================= */
+.star-rating{
+  display:flex;
+  gap:6px;
+  font-size:32px;
+  line-height:1;
+  user-select:none;
+}
+
+.btn-report {
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid rgba(229,62,62,.4);
+    border-radius: 8px;
+    color: #fc8181;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .btn-report:hover {
+    background: rgba(229,62,62,.12);
+  }
+/* ⚠️ 전역 .star를 건드리면 다른 페이지 별/아이콘도 깨짐
+   => 반드시 star-rating 내부에서만 */
+.star-rating .star{
+  cursor:pointer;
+  color: rgba(255,255,255,.25);
+  transition: transform .12s ease;
+}
+.star-rating .star.active{
+  color: gold;
+}
+.star-rating .star.half{
+  background: linear-gradient(90deg, gold 50%, rgba(255,255,255,.25) 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.star-rating .star:hover{
+  transform: translateY(-1px);
+}
+
